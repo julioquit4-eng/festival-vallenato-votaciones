@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" fill="none">
+  <!-- Pentagrama ondulado estilo vallenato -->
+  <path d="M0,80 Q300,20 600,80 T1200,60" stroke="#C5A880" stroke-width="1.5" stroke-opacity="0.35"/>
+  <path d="M0,105 Q300,45 600,105 T1200,85" stroke="#C5A880" stroke-width="1.5" stroke-opacity="0.35"/>
+  <path d="M0,130 Q300,70 600,130 T1200,110" stroke="#C5A880" stroke-width="1.5" stroke-opacity="0.35"/>
+  <path d="M0,155 Q300,95 600,155 T1200,135" stroke="#C5A880" stroke-width="1.5" stroke-opacity="0.35"/>
+  <path d="M0,180 Q300,120 600,180 T1200,160" stroke="#C5A880" stroke-width="1.5" stroke-opacity="0.35"/>
+
+  <!-- Clave de sol estilizada -->
+  <path d="M90,195 C90,210 110,215 115,200 C120,185 95,160 95,130 C95,90 125,50 115,30 C110,20 102,25 102,40 C102,80 135,120 125,170 C120,195 90,185 90,160 C90,140 105,130 115,138" stroke="#E58E26" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.45"/>
+
+  <!-- Notas musicales en movimiento -->
+  <!-- Nota 1 -->
+  <ellipse cx="280" cy="115" rx="14" ry="10" transform="rotate(-20 280 115)" fill="#E58E26" fill-opacity="0.4"/>
+  <path d="M292,111 L292,45" stroke="#E58E26" stroke-width="2.5" stroke-linecap="round" stroke-opacity="0.4"/>
+  <path d="M292,45 Q315,55 310,75" stroke="#E58E26" stroke-width="2.5" fill="none" stroke-opacity="0.4"/>
+
+  <!-- Nota 2 (Doble corchea) -->
+  <ellipse cx="480" cy="140" rx="13" ry="9" transform="rotate(-20 480 140)" fill="#C5A880" fill-opacity="0.4"/>
+  <path d="M491,136 L491,70" stroke="#C5A880" stroke-width="2.5" stroke-opacity="0.4"/>
+  <ellipse cx="550" cy="125" rx="13" ry="9" transform="rotate(-20 550 125)" fill="#C5A880" fill-opacity="0.4"/>
+  <path d="M561,121 L561,55" stroke="#C5A880" stroke-width="2.5" stroke-opacity="0.4"/>
+  <path d="M491,70 L561,55 L561,65 L491,80 Z" fill="#C5A880" fill-opacity="0.4"/>
+
+  <!-- Nota 3 -->
+  <ellipse cx="780" cy="95" rx="14" ry="10" transform="rotate(-20 780 95)" fill="#E58E26" fill-opacity="0.35"/>
+  <path d="M792,91 L792,25" stroke="#E58E26" stroke-width="2.5" stroke-linecap="round" stroke-opacity="0.35"/>
+
+  <!-- Nota 4 -->
+  <ellipse cx="980" cy="145" rx="14" ry="10" transform="rotate(-20 980 145)" fill="#C5A880" fill-opacity="0.35"/>
+  <path d="M992,141 L992,75" stroke="#C5A880" stroke-width="2.5" stroke-linecap="round" stroke-opacity="0.35"/>
+  <path d="M992,75 Q1015,85 1010,105" stroke="#C5A880" stroke-width="2.5" fill="none" stroke-opacity="0.35"/>
+</svg>

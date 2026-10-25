@@ -1,0 +1,60 @@
+{% load static %}<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Inicio{% endblock %} · Votaciones Festival de la Leyenda Vallenata 2027</title>
+  <meta name="description" content="{% block meta_description %}Plataforma web de votaciones del Festival de la Leyenda Vallenata 2027: consulta categorías, participa de forma segura y revisa resultados publicados.{% endblock %}">
+  <meta name="theme-color" content="#10243A">
+  <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+
+  {# Tipografías (con alternativas del sistema si no hay conexión) #}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Manrope:wght@400;500;600;700;800&display=swap">
+
+  {# Bootstrap 5.3 + Bootstrap Icons (CDN). Para uso sin Internet, copiar a static/vendor/ y cambiar estas rutas. #}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}" data-page="{% block page_id %}{% endblock %}" data-section="{% block nav_section %}{% endblock %}">
+  <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
+
+  {% block layout %}{% endblock %}
+
+  {% include "partials/ui_feedback.html" %}
+
+  {% comment %}
+    PUNTO DE INTEGRACIÓN: mapa de URLs para JavaScript, generado con {% url %}.
+    Los nombres deben existir en los urls.py de Django (ver docs/INTEGRACION_DJANGO.md).
+  {% endcomment %}
+  <script id="app-urls" type="application/json">{
+    "static": "{% static '' %}",
+    "inicio": "{% url 'public:inicio' %}",
+    "votaciones": "{% url 'public:votaciones' %}",
+    "detalle": "{% url 'public:detalle_votacion' %}",
+    "acceso": "{% url 'public:acceso_votante' %}",
+    "confirmar": "{% url 'public:confirmar_voto' %}",
+    "comprobante": "{% url 'public:comprobante' %}",
+    "resultados": "{% url 'public:resultados' %}",
+    "guia": "{% url 'public:guia' %}",
+    "privacidad": "{% url 'public:privacidad' %}",
+    "login": "{% url 'public:login' %}",
+    "panel_dashboard": "{% url 'panel:dashboard' %}",
+    "panel_ediciones": "{% url 'panel:ediciones' %}",
+    "panel_categorias": "{% url 'panel:categorias' %}",
+    "panel_opciones": "{% url 'panel:opciones' %}",
+    "panel_votaciones": "{% url 'panel:votaciones' %}",
+    "panel_votantes": "{% url 'panel:votantes' %}",
+    "panel_reportes": "{% url 'panel:reportes' %}"
+  }</script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  {# DEMO: eliminar demo-data.js al conectar con Django #}
+  <script src="{% static 'js/demo-data.js' %}"></script>
+  <script src="{% static 'js/main.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

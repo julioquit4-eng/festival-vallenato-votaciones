@@ -1,0 +1,175 @@
+{% load static %}<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Panel de Control{% endblock %} · Festival Vallenato 2027</title>
+  <meta name="theme-color" content="#10243A">
+  <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="panel" data-page="{% block page_id %}{% endblock %}" data-section="{% block nav_section %}{% endblock %}">
+  <a class="skip-link" href="#contenidoPanel">Saltar al contenido del panel</a>
+
+  <div class="panel-shell">
+    <!-- Sidebar de Navegación Administrativa (Offcanvas en móvil) -->
+    <aside class="panel-sidebar offcanvas-lg offcanvas-start" tabindex="-1" id="adminSidebar" aria-labelledby="adminSidebarLabel">
+      <div class="offcanvas-header d-lg-none">
+        <h5 class="offcanvas-title text-white" id="adminSidebarLabel">Menú de Gestión</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#adminSidebar" aria-label="Cerrar navegación"></button>
+      </div>
+      
+      <a href="{% url 'panel:dashboard' %}" class="panel-brand">
+        <span class="vf-brand__mark"><i class="bi bi-shield-shaded"></i></span>
+        <div>
+          <strong>Panel Electoral</strong>
+          <small>Festival Vallenato 2027</small>
+        </div>
+      </a>
+
+      <div class="offcanvas-body">
+        <nav class="panel-nav" aria-label="Navegación del panel">
+          <div class="panel-nav__label">Supervisión</div>
+          <ul class="nav flex-column mb-2">
+            <li class="nav-item">
+              <a class="nav-link" data-nav="dashboard" href="{% url 'panel:dashboard' %}">
+                <i class="bi bi-grid-1x2"></i> Dashboard general
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-nav="reportes" href="{% url 'panel:reportes' %}">
+                <i class="bi bi-graph-up-arrow"></i> Reportes y auditoría
+              </a>
+            </li>
+          </ul>
+
+          <div class="panel-nav__label">Configuración del certamen</div>
+          <ul class="nav flex-column mb-2">
+            <li class="nav-item">
+              <a class="nav-link" data-nav="ediciones" href="{% url 'panel:ediciones' %}">
+                <i class="bi bi-calendar-event"></i> Ediciones anuales
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-nav="categorias" href="{% url 'panel:categorias' %}">
+                <i class="bi bi-tags"></i> Categorías
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-nav="votaciones" href="{% url 'panel:votaciones' %}">
+                <i class="bi bi-ui-checks-grid"></i> Procesos de votación
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-nav="opciones" href="{% url 'panel:opciones' %}">
+                <i class="bi bi-person-lines-fill"></i> Opciones y candidatos
+              </a>
+            </li>
+          </ul>
+
+          <div class="panel-nav__label">Padrón de votantes</div>
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link" data-nav="votantes" href="{% url 'panel:votantes' %}">
+                <i class="bi bi-file-earmark-person"></i> Carga y censo electoral
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="panel-sidebar__foot mt-auto">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="badge bg-success-subtle text-success border border-success"><i class="bi bi-shield-check me-1"></i>Oficial</span>
+            <a href="{% url 'public:inicio' %}" class="small text-decoration-none text-white-50">
+              <i class="bi bi-box-arrow-up-right me-1"></i>Portal público
+            </a>
+          </div>
+          <a href="{% url 'public:login' %}" class="btn btn-sm btn-outline-light w-100 mt-2">
+            <i class="bi bi-box-arrow-right me-1"></i>Cerrar sesión
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Contenedor Principal -->
+    <div class="panel-main">
+      <!-- Topbar Administrativa -->
+      <header class="panel-topbar">
+        <button class="btn btn-sm btn-outline-secondary d-lg-none me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminSidebar" aria-controls="adminSidebar" aria-label="Abrir menú de gestión">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <div>
+          <h1>{% block header_title %}Panel Administrativo{% endblock %}</h1>
+          <nav aria-label="Miga de pan">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="{% url 'panel:dashboard' %}">Admin</a></li>
+              {% block breadcrumbs %}{% endblock %}
+            </ol>
+          </nav>
+        </div>
+        <div class="ms-auto d-flex align-items-center gap-2 gap-sm-3">
+          <div class="panel-user">
+            <div class="vf-avatar--sm text-white" style="background:#0050D8; display:grid; place-items:center; border-radius:50%; font-weight:700;">AD</div>
+            <div class="d-none d-md-block text-start lh-1">
+              <span class="d-block fw-bold" style="font-size:0.85rem;">Comité Técnico</span>
+              <small class="text-muted" style="font-size:0.7rem;">Administrador</small>
+            </div>
+          </div>
+          <a href="{% url 'public:login' %}" class="btn btn-sm btn-outline-danger" title="Cerrar sesión">
+            <i class="bi bi-box-arrow-right"></i><span class="d-none d-sm-inline ms-1">Salir</span>
+          </a>
+        </div>
+      </header>
+
+      <!-- Cinta de estado institucional -->
+      <div class="panel-demo-strip d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <span><i class="bi bi-shield-check me-1"></i> <strong>Panel Electoral:</strong> Festival de la Leyenda Vallenata 2027 · Plataforma Oficial en Construcción</span>
+        <span class="small text-muted fst-italic">Capa de presentación institucional</span>
+      </div>
+
+      <!-- Contenido Específico -->
+      <main class="panel-content" id="contenidoPanel">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+
+  {% include "partials/ui_feedback.html" %}
+
+  <script id="app-urls" type="application/json">{
+    "static": "{% static '' %}",
+    "inicio": "{% url 'public:inicio' %}",
+    "votaciones": "{% url 'public:votaciones' %}",
+    "detalle": "{% url 'public:detalle_votacion' %}",
+    "acceso": "{% url 'public:acceso_votante' %}",
+    "confirmar": "{% url 'public:confirmar_voto' %}",
+    "comprobante": "{% url 'public:comprobante' %}",
+    "resultados": "{% url 'public:resultados' %}",
+    "guia": "{% url 'public:guia' %}",
+    "privacidad": "{% url 'public:privacidad' %}",
+    "login": "{% url 'public:login' %}",
+    "panel_dashboard": "{% url 'panel:dashboard' %}",
+    "panel_ediciones": "{% url 'panel:ediciones' %}",
+    "panel_categorias": "{% url 'panel:categorias' %}",
+    "panel_opciones": "{% url 'panel:opciones' %}",
+    "panel_votaciones": "{% url 'panel:votaciones' %}",
+    "panel_votantes": "{% url 'panel:votantes' %}",
+    "panel_reportes": "{% url 'panel:reportes' %}"
+  }</script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{% static 'js/demo-data.js' %}"></script>
+  <script src="{% static 'js/main.js' %}"></script>
+  <script src="{% static 'js/admin.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

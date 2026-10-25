@@ -1,0 +1,62 @@
+{% extends "public/base_public.html" %}
+{% load static %}
+
+{% block title %}Política de privacidad y tratamiento de datos{% endblock %}
+{% block page_id %}privacidad{% endblock %}
+{% block nav_section %}guia{% endblock %}
+
+{% block content %}
+<header class="page-hero">
+  <div class="container">
+    <nav aria-label="Miga de pan">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'public:inicio' %}">Inicio</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Privacidad</li>
+      </ol>
+    </nav>
+    <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+      <span class="vf-eyebrow vf-eyebrow--light">Marco normativo</span>
+      <span class="vf-demo-tag"><i class="bi bi-shield-check"></i>Habeas Data</span>
+    </div>
+    <h1>Tratamiento de Datos Personales</h1>
+    <p>Lineamientos preliminares sobre privacidad, seguridad de la información y anonimización del voto en el marco del certamen.</p>
+  </div>
+</header>
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-9">
+      <div class="vf-card vf-card--pad bg-white">
+        <h2 class="h4 mb-3">1. Finalidad del tratamiento</h2>
+        <p class="text-muted">
+          Los datos solicitados a los participantes (número de cédula y correo electrónico) se recaudan con el exclusivo propósito de verificar la habilitación en el padrón electoral oficial y prevenir el sufragio múltiple en concordancia con el requerimiento RF-03.
+        </p>
+
+        <h2 class="h4 mb-3 mt-4">2. Principio de sufragio secreto</h2>
+        <p class="text-muted">
+          La arquitectura del sistema garantiza la estricta disociación entre los registros de autenticación del votante y el sentido del voto depositado. En ningún momento la organización o administradores podrán vincular la identidad de un ciudadano con la opción votada.
+        </p>
+
+        <h2 class="h4 mb-3 mt-4">3. Prototipo y datos de prueba</h2>
+        <div class="vf-alert vf-alert--demo mb-4">
+          <i class="bi bi-info-circle"></i>
+          <div class="small">
+            En la presente fase de prototipado frontend, <strong>ningún dato ingresado en los formularios es remitido a servidores externos ni almacenado de forma persistente</strong>. Toda validación mostrada es de naturaleza demostrativa.
+          </div>
+        </div>
+
+        <h2 class="h4 mb-3 mt-4">4. Derechos del titular</h2>
+        <p class="text-muted mb-4">
+          Los titulares de la información podrán en cualquier momento ejercer sus derechos de consulta, actualización y supresión de datos a través de los canales institucionales dispuestos por la organización del certamen.
+        </p>
+
+        <div class="border-top pt-4">
+          <a href="{% url 'public:inicio' %}" class="btn btn-vf-outline">
+            <i class="bi bi-arrow-left"></i> Volver al inicio
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

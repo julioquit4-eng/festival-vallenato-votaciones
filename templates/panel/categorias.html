@@ -1,0 +1,10 @@
+{% extends "panel/ediciones.html" %}
+{# Reutiliza la misma interfaz de ediciones/categorías con foco en categorías #}
+{% block title %}Gestión de Categorías{% endblock %}
+{% block header_title %}Categorías de Competición{% endblock %}
+{% block page_id %}categorias{% endblock %}
+{% block nav_section %}categorias{% endblock %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'panel:ediciones' %}">Ediciones</a></li>
+<li class="breadcrumb-item active" aria-current="page">Categorías</li>
+{% endblock %}

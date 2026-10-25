@@ -1,0 +1,89 @@
+{% extends "public/base_public.html" %}
+{% load static %}
+
+{% block title %}Comprobante de voto{% endblock %}
+{% block page_id %}comprobante{% endblock %}
+{% block nav_section %}votaciones{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <ol class="vf-stepper mb-5 d-none d-print-none d-md-flex" aria-label="Progreso de votación">
+    <li class="is-done"><span class="dot"><i class="bi bi-check"></i></span><span>Opción</span></li>
+    <li class="is-done"><span class="dot"><i class="bi bi-check"></i></span><span>Validación</span></li>
+    <li class="is-done"><span class="dot"><i class="bi bi-check"></i></span><span>Confirmar</span></li>
+    <li class="is-current" aria-current="step"><span class="dot">4</span><span>Comprobante</span></li>
+  </ol>
+
+  <!-- Tarjeta de Comprobante / Recibo -->
+  <article class="receipt vf-reveal" aria-labelledby="receiptTitle">
+    <div class="receipt__head">
+      <div class="receipt__icon" aria-hidden="true">
+        <i class="bi bi-check-lg"></i>
+      </div>
+      <span class="vf-eyebrow vf-eyebrow--light mt-3">Festival de la Leyenda Vallenata 2027</span>
+      <h1 id="receiptTitle">¡Voto Registrado con Éxito!</h1>
+      <p class="text-white-50 small mb-0">Comprobante de participación ciudadana</p>
+    </div>
+
+    <div class="receipt__perforation" aria-hidden="true"></div>
+
+    <div class="receipt__body">
+      <!-- Marca de agua oficial del certamen -->
+      <div class="receipt__watermark" aria-hidden="true">FESTIVAL VALLENATO 2027</div>
+
+      <div class="vf-alert vf-alert--success mb-4 d-print-none">
+        <i class="bi bi-shield-check"></i>
+        <div class="small">
+          <strong>Constancia Digital:</strong> Tu participación ha sido asentada de manera segura e irreversible. Puedes descargar o imprimir este comprobante para tus registros.
+        </div>
+      </div>
+
+      <dl class="row mb-4">
+        <dt class="col-sm-4 text-muted">Votación:</dt>
+        <dd class="col-sm-8 fw-bold" id="rcptVoteTitle">Favorito del público: Acordeonero Profesional</dd>
+
+        <dt class="col-sm-4 text-muted">Categoría:</dt>
+        <dd class="col-sm-8" id="rcptCategoryTitle">Acordeonero Profesional</dd>
+
+        <dt class="col-sm-4 text-muted">Fecha y hora:</dt>
+        <dd class="col-sm-8" id="rcptTimestamp">25 de octubre de 2026, 10:45 AM</dd>
+
+        <dt class="col-sm-4 text-muted">Identificador votante:</dt>
+        <dd class="col-sm-8 vf-mono" id="rcptVoterMask">C.C. ••••••••456</dd>
+      </dl>
+
+      <div class="mb-4">
+        <label class="form-label text-muted text-uppercase fw-bold" style="font-size:0.75rem;">Código de comprobante digital (Hash simulado):</label>
+        <div class="receipt__code vf-mono" id="rcptHashCode">
+          VF2027-SIM-8F4A-91C2-E03B-B821
+        </div>
+        <div class="text-center mt-1">
+          <small class="text-muted" style="font-size:0.72rem;">Conserva este código para consultas sobre la trazabilidad de tu registro.</small>
+        </div>
+      </div>
+
+      <div class="p-3 bg-light rounded-3 border d-flex align-items-center gap-3 mb-4">
+        <i class="bi bi-shield-lock-fill text-success fs-3"></i>
+        <div class="small text-muted">
+          El sentido individual de tu voto ha sido anonimizado en la urna electrónica conforme al principio de sufragio secreto.
+        </div>
+      </div>
+
+      <!-- Acciones (ocultas en impresión) -->
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 pt-3 border-top d-print-none">
+        <a href="{% url 'public:inicio' %}" class="btn btn-vf-outline">
+          <i class="bi bi-house"></i> Volver al inicio
+        </a>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-vf-outline" data-action="print">
+            <i class="bi bi-printer"></i> Imprimir comprobante
+          </button>
+          <a href="{% url 'public:votaciones' %}" class="btn btn-vf">
+            Ver más votaciones <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </article>
+</div>
+{% endblock %}

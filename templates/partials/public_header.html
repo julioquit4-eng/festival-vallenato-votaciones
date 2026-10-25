@@ -1,0 +1,32 @@
+<header class="site-header">
+  <nav class="navbar navbar-expand-lg" aria-label="Navegación principal">
+    <div class="container">
+      <a class="vf-brand" href="{% url 'public:inicio' %}" aria-label="Festival Vallenato · Votaciones 2027, ir al inicio">
+        <span class="vf-brand__mark" aria-hidden="true"><i class="bi bi-music-note-beamed"></i></span>
+        <span class="vf-brand__text">
+          <span class="vf-brand__name">Festival Vallenato</span>
+          <span class="vf-brand__sub">Votaciones · 2027</span>
+        </span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Abrir menú de navegación">
+        <i class="bi bi-list fs-4" aria-hidden="true"></i>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav mx-auto gap-lg-1">
+          <li class="nav-item"><a class="nav-link" data-nav="inicio" href="{% url 'public:inicio' %}">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" data-nav="votaciones" href="{% url 'public:votaciones' %}">Votaciones</a></li>
+          <li class="nav-item"><a class="nav-link" data-nav="resultados" href="{% url 'public:resultados' %}">Resultados</a></li>
+          <li class="nav-item"><a class="nav-link" data-nav="guia" href="{% url 'public:guia' %}">Guía de participación</a></li>
+        </ul>
+        <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-2 mt-3 mt-lg-0">
+          <button type="button" class="btn btn-vf-outline btn-sm" id="headerBtnLogin" data-bs-toggle="modal" data-bs-target="#loginModal">
+            <i class="bi bi-person-circle" aria-hidden="true"></i>Iniciar sesión
+          </button>
+          <button type="button" class="btn btn-vf btn-sm" id="headerCtaVotar" data-bs-toggle="modal" data-bs-target="#voterAccessModal">
+            <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>Ingresar a votar
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>

@@ -1,0 +1,77 @@
+{% extends "public/base_public.html" %}
+{% load static %}
+
+{% block title %}Votaciones disponibles{% endblock %}
+{% block page_id %}votaciones{% endblock %}
+{% block nav_section %}votaciones{% endblock %}
+
+{% block content %}
+<header class="page-hero">
+  <div class="container">
+    <nav aria-label="Miga de pan">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'public:inicio' %}">Inicio</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Votaciones</li>
+      </ol>
+    </nav>
+    <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+      <span class="vf-eyebrow vf-eyebrow--light">Edición 2027</span>
+      <span class="vf-badge vf-badge--royal"><i class="bi bi-trophy" aria-hidden="true"></i>Categorías Oficiales</span>
+    </div>
+    <h1>Votaciones del Festival</h1>
+    <p>Explora los procesos de votación habilitados para la edición actual. Filtra por estado (abierta, próximamente o cerrada) o busca directamente por nombre de categoría.</p>
+  </div>
+</header>
+
+<div class="container">
+  <!-- Barra de Filtros y Búsqueda -->
+  <div class="filter-bar mb-5">
+    <div class="row g-3 align-items-center">
+      <div class="col-lg-7">
+        <div class="chip-group" role="group" aria-label="Filtrar por estado de votación" id="statusFilterGroup">
+          <button type="button" class="chip" data-status-filter="todas" aria-pressed="true">
+            Todas <span class="count" id="countTodas">0</span>
+          </button>
+          <button type="button" class="chip" data-status-filter="abierta" aria-pressed="false">
+            <i class="bi bi-unlock-fill text-success" aria-hidden="true"></i> Abiertas <span class="count" id="countAbiertas">0</span>
+          </button>
+          <button type="button" class="chip" data-status-filter="proxima" aria-pressed="false">
+            <i class="bi bi-hourglass-split text-info" aria-hidden="true"></i> Próximamente <span class="count" id="countProximas">0</span>
+          </button>
+          <button type="button" class="chip" data-status-filter="cerrada" aria-pressed="false">
+            <i class="bi bi-lock-fill text-secondary" aria-hidden="true"></i> Cerradas <span class="count" id="countCerradas">0</span>
+          </button>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="vf-input-icon">
+          <i class="bi bi-search" aria-hidden="true"></i>
+          <input type="search" class="form-control" id="searchVotesInput" placeholder="Buscar por categoría o nombre..." aria-label="Buscar votaciones por texto">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rejilla de Tarjetas de Votación -->
+  <section aria-labelledby="listaVotacionesHeading">
+    <h2 id="listaVotacionesHeading" class="visually-hidden">Listado de votaciones filtradas</h2>
+    
+    <div class="row g-4" id="votesListContainer" aria-live="polite">
+      <!-- Se inyecta dinámicamente vía JavaScript (voting.js) usando VFDemo o se renderiza con Django -->
+      <div class="col-12 text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando votaciones...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estado vacío si ningún filtro coincide -->
+    <div id="noVotesFound" class="vf-empty d-none">
+      <i class="bi bi-search" aria-hidden="true"></i>
+      <h3>No encontramos votaciones con ese criterio</h3>
+      <p class="text-muted">Intenta ajustando el filtro de estado o revisa los términos de búsqueda ingresados.</p>
+      <button type="button" class="btn btn-vf-outline btn-sm mt-2" id="btnResetFilters">Restablecer filtros</button>
+    </div>
+  </section>
+</div>
+{% endblock %}

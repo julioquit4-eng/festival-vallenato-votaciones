@@ -1,0 +1,147 @@
+{% extends "public/base_public.html" %}
+{% load static %}
+
+{% block title %}Guía de participación{% endblock %}
+{% block page_id %}guia{% endblock %}
+{% block nav_section %}guia{% endblock %}
+
+{% block content %}
+<header class="page-hero">
+  <div class="container">
+    <nav aria-label="Miga de pan">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'public:inicio' %}">Inicio</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Guía de participación</li>
+      </ol>
+    </nav>
+    <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+      <span class="vf-eyebrow vf-eyebrow--light">Orientación al votante</span>
+      <span class="vf-demo-tag"><i class="bi bi-cone-striped"></i>Informativo</span>
+    </div>
+    <h1>¿Cómo participar en las votaciones?</h1>
+    <p>Conoce el paso a paso detallado para ejercer tu voto de manera informada, segura y transparente en el Festival de la Leyenda Vallenata 2027.</p>
+  </div>
+</header>
+
+<div class="container my-5">
+  <div class="row g-5">
+    <!-- Columna de Pasos (Timeline) -->
+    <div class="col-lg-7">
+      <h2 class="h3 mb-4">El proceso en 7 pasos</h2>
+      
+      <ol class="timeline">
+        <li>
+          <div class="vf-card">
+            <h3>1. Consulta las votaciones disponibles</h3>
+            <p>Ingresa a la sección de <a href="{% url 'public:votaciones' %}">Votaciones</a> y verifica qué categorías se encuentran en estado <strong>Abierta</strong>. Las votaciones con estado Próximamente o Cerrada no admiten votos.</p>
+          </div>
+        </li>
+        <li>
+          <div class="vf-card">
+            <h3>2. Conoce a los candidatos u opciones</h3>
+            <p>Accede al detalle de la categoría para conocer la reseña artística, repertorio o datos autorizados de cada concursante o agrupación participante.</p>
+          </div>
+        </li>
+        <li>
+          <div class="vf-card">
+            <h3>3. Selecciona tu opción predilecta</h3>
+            <p>Elige de manera exclusiva a tu candidato de preferencia marcando su tarjeta correspondiente. No es posible seleccionar más de una opción en una votación uninominal.</p>
+          </div>
+        </li>
+        <li>
+          <div class="vf-card">
+            <h3>4. Valida tu identidad en el padrón</h3>
+            <p>Ingresa tu número de documento de identidad y tu correo electrónico previamente registrados. Solo podrán votar quienes figuren habilitados en el padrón oficial del certamen.</p>
+          </div>
+        </li>
+        <li>
+          <div class="vf-card">
+            <h3>5. Revisa el resumen de tu selección</h3>
+            <p>Verifica que los datos de la categoría y la opción elegida coincidan con tu voluntad. En este paso aún puedes regresar y corregir tu selección.</p>
+          </div>
+        </li>
+        <li>
+          <div class="vf-card">
+            <h3>6. Confirma la emisión de tu voto</h3>
+            <p>Acepta la advertencia modal de voto definitivo. <strong>Una vez emitido, el voto no podrá ser modificado ni cancelado</strong>, garantizando el principio de un solo voto por persona.</p>
+          </div>
+        </li>
+        <li>
+          <div class="vf-card">
+            <h3>7. Descarga o imprime tu comprobante</h3>
+            <p>El sistema te presentará un comprobante digital con fecha, hora e identificador de trazabilidad para tu archivo personal.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- Columna de Preguntas Frecuentes (FAQ) -->
+    <div class="col-lg-5">
+      <div class="sticky-top" style="top: 6rem;">
+        <h2 class="h3 mb-4" id="preguntas">Preguntas Frecuentes</h2>
+
+        <div class="accordion" id="faqAccordion">
+          <div class="accordion-item">
+            <h3 class="accordion-header" id="faqHeading1">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="true" aria-controls="faqCollapse1">
+                ¿Puedo votar más de una vez?
+              </button>
+            </h3>
+            <div id="faqCollapse1" class="accordion-collapse collapse show" aria-labelledby="faqHeading1" data-bs-parent="#faqAccordion">
+              <div class="accordion-body text-muted small">
+                No. De acuerdo con el reglamento de transparencia (RF-05), cada ciudadano habilitado en el padrón dispone de exactamente un único voto por cada votación habilitada.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h3 class="accordion-header" id="faqHeading2">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
+                ¿Qué hago si mi documento no está habilitado?
+              </button>
+            </h3>
+            <div id="faqCollapse2" class="accordion-collapse collapse" aria-labelledby="faqHeading2" data-bs-parent="#faqAccordion">
+              <div class="accordion-body text-muted small">
+                El padrón de votantes es consolidado por la organización previo al inicio del Festival. Si consideras que cumples los requisitos de inscripción, comunícate con la coordinación técnica del certamen a través de los canales institucionales.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h3 class="accordion-header" id="faqHeading3">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3" aria-expanded="false" aria-controls="faqCollapse3">
+                ¿Cuándo se publican los resultados?
+              </button>
+            </h3>
+            <div id="faqCollapse3" class="accordion-collapse collapse" aria-labelledby="faqHeading3" data-bs-parent="#faqAccordion">
+              <div class="accordion-body text-muted small">
+                Los resultados oficiales solo se divulgan una vez que el periodo de votación haya finalizado y los datos hayan sido auditados y validados por el comité organizador (RF-06). No se exhiben resultados parciales durante la votación.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h3 class="accordion-header" id="faqHeading4">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse4" aria-expanded="false" aria-controls="faqCollapse4">
+                ¿Cómo protegen mis datos personales?
+              </button>
+            </h3>
+            <div id="faqCollapse4" class="accordion-collapse collapse" aria-labelledby="faqHeading4" data-bs-parent="#faqAccordion">
+              <div class="accordion-body text-muted small">
+                La plataforma implementa disociación entre los datos de identificación del votante y el sentido del voto depositado en la urna virtual, cumpliendo a cabalidad con la Ley de Protección de Datos Personales (Habeas Data).
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="vf-card vf-card--pad mt-4 bg-light border">
+          <h3 class="h6 text-dark mb-2"><i class="bi bi-shield-check text-success me-1"></i> Transparencia y Garantías</h3>
+          <p class="small text-muted mb-0">
+            Todas las reglas definitivas del proceso de votación son emanadas por la Fundación Festival de la Leyenda Vallenata. Este prototipo reproduce con exactitud las reglas de negocio técnicas concertadas.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

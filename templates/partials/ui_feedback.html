@@ -1,0 +1,23 @@
+{# Componentes de retroalimentación compartidos: región de toasts y modal de confirmación genérico (VF.confirm) #}
+<div id="vfToastRegion" class="toast-container position-fixed bottom-0 end-0 p-3 vf-toast-region" aria-live="polite" aria-atomic="false"></div>
+
+<div class="modal fade" id="vfConfirmModal" tabindex="-1" aria-labelledby="vfConfirmTitle" aria-describedby="vfConfirmMessage" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body p-4">
+        <div class="d-flex gap-3 align-items-start">
+          <span id="vfConfirmIcon" class="vf-icon-circle vf-icon-circle--night"><i class="bi bi-question-lg" aria-hidden="true"></i></span>
+          <div>
+            <h2 class="modal-title mb-2" id="vfConfirmTitle">Confirmar acción</h2>
+            <p class="mb-2" id="vfConfirmMessage"></p>
+            <p class="small text-muted mb-0" id="vfConfirmNote" hidden></p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer flex-wrap gap-2">
+        <button type="button" class="btn btn-vf-outline" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-vf" id="vfConfirmOk">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>

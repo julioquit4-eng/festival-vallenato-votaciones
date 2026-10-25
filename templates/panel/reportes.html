@@ -1,0 +1,80 @@
+{% extends "panel/base_panel.html" %}
+{% load static %}
+
+{% block title %}Reportes y Escrutinio Administrativo{% endblock %}
+{% block header_title %}Reportes y Auditoría de Resultados{% endblock %}
+{% block page_id %}reportes{% endblock %}
+{% block nav_section %}reportes{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item active" aria-current="page">Reportes Electorales</li>
+{% endblock %}
+
+{% block content %}
+<div class="panel-card mb-4">
+  <div class="panel-card__head">
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+      <h2><i class="bi bi-file-earmark-bar-graph me-2 text-primary"></i> Informe Consolidado por Proceso</h2>
+      <select class="form-select form-select-sm" id="reportVoteSelect" style="max-width: 320px;">
+        <!-- Dinámico con admin.js -->
+      </select>
+    </div>
+    <div class="d-flex gap-2">
+      <button type="button" class="btn btn-sm btn-vf-outline" data-action="print">
+        <i class="bi bi-printer"></i> Vista Imprimible
+      </button>
+      <button type="button" class="btn btn-sm btn-vf" id="btnExportDemoCsv">
+        <i class="bi bi-download"></i> Descargar CSV Demo
+      </button>
+    </div>
+  </div>
+
+  <div class="panel-card__body">
+    <!-- Métricas del Reporte -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <div class="p-3 bg-light rounded-3 border">
+          <small class="text-muted d-block text-uppercase fw-bold" style="font-size:0.7rem;">Censo Electoral Habilitado</small>
+          <div class="h3 fw-bold mb-0 text-dark" id="repCensus">1,250</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3 bg-light rounded-3 border">
+          <small class="text-muted d-block text-uppercase fw-bold" style="font-size:0.7rem;">Votos Válidos Emitidos</small>
+          <div class="h3 fw-bold mb-0 text-primary" id="repTotalVotes">534</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3 bg-light rounded-3 border">
+          <small class="text-muted d-block text-uppercase fw-bold" style="font-size:0.7rem;">Porcentaje de Participación</small>
+          <div class="h3 fw-bold mb-0 text-success" id="repParticipationPct">42.7 %</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla Detallada de Opciones Escrutadas -->
+    <h3 class="h5 mb-3">Desglose de Escrutinio por Opción / Candidato</h3>
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle mb-0" id="reportResultsTable">
+        <thead class="table-light">
+          <tr>
+            <th>Posición</th>
+            <th>Candidato u Opción</th>
+            <th>Votos Obtenidos</th>
+            <th>Porcentaje</th>
+            <th>Gráfico de Representación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Dinámico -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mt-4 pt-3 border-top text-muted small d-flex justify-content-between align-items-center">
+      <span><i class="bi bi-info-circle me-1"></i> Reporte generado a partir de datos de prueba precalculados.</span>
+      <span class="fst-italic">La auditoría definitiva y firma digital se efectuará en la etapa de backend.</span>
+    </div>
+  </div>
+</div>
+{% endblock %}

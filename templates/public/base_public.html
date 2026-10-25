@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+{% comment %}Plantilla base del portal público. Las páginas definen: title, page_id, nav_section, content y opcionalmente page_js.{% endcomment %}
+
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/public.css' %}">{% endblock %}
+{% block body_class %}portal{% endblock %}
+
+{% block layout %}
+  {% include "partials/public_header.html" %}
+  <main id="contenido" tabindex="-1">
+    {% block content %}{% endblock %}
+  </main>
+  {% include "partials/public_footer.html" %}
+  {% include "partials/voter_modal.html" %}
+  {% include "partials/login_modal.html" %}
+{% endblock %}
+
+{% block extra_js %}<script src="{% static 'js/voting.js' %}"></script>{% endblock %}

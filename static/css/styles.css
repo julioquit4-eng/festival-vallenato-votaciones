@@ -1,0 +1,1078 @@
+/* ==========================================================================
+   Festival de la Leyenda Vallenata 2027 · Sistema de Votaciones
+   styles.css — Tokens de diseño y componentes compartidos (portal + panel)
+   Cargar DESPUÉS de bootstrap.min.css.
+   ========================================================================== */
+
+/* -------------------------------------------------------------------------
+   1. TOKENS (cambiar aquí para ajustar toda la identidad visual)
+   ------------------------------------------------------------------------- */
+:root {
+  /* =========================================================================
+     PALETA COLOMBIANA TRADICIONAL · VALLENATO, SABOR Y AUTENTICIDAD
+     Base predominante: BLANCO PURO (#FFFFFF)
+     Inspirada en las ventanas y balcones coloniales de Colombia:
+     - Amarillo Sol Guatapurí (Eje Cafetero): #FFBA00 (Alegría, oro y acordeón)
+     - Naranja Atardecer Costeño (Risaralda): #FF5500 (Sabor, fuego y calidez)
+     - Rojo Fiesta / Tambora (Caldas): #E31B23 (Pasión y tradición)
+     - Azul Colonial / Caribe (Valle): #0050D8 (Profundidad, nobleza y leyenda)
+     - Azul Celeste / Río (Antioquia): #0088CC (Río Guatapurí y cielo costeño)
+     - Verde Sierra Nevada (Quindío): #008744 (Esperanza y los valles del Cesar)
+     ========================================================================= */
+  --vf-white: #FFFFFF;
+  --vf-ivory: #FFFFFF;          /* Blanco como fondo predominante absoluto */
+  --vf-ivory-2: #F8FAFC;        /* Superficie neutra limpia para tarjetas y contrastes */
+  --vf-surface: #FFFFFF;
+  
+  --vf-night: #0B1E36;          /* Azul noche colonial profundo para textos de máxima nitidez */
+  --vf-deep: #0050D8;           /* Azul real colombiano / Valle */
+  --vf-deep-2: #003CA3;
+  
+  /* Los 6 colores de la tradición colombiana */
+  --vf-yellow: #FFBA00;         /* Amarillo Eje Cafetero / Sol */
+  --vf-gold: #FFBA00;
+  --vf-gold-soft: #FFF8E6;
+  --vf-gold-ink: #8A6200;
+
+  --vf-orange: #FF5500;         /* Naranja Risaralda / Sabor */
+  --vf-orange-soft: #FFF0E8;
+
+  --vf-red: #E31B23;            /* Rojo Caldas / Pasión */
+  --vf-red-soft: #FDE8E9;
+
+  --vf-blue-royal: #0050D8;     /* Azul Valle / Colonial */
+  --vf-blue: #0050D8;
+  --vf-blue-soft: #EBF2FE;
+
+  --vf-blue-sky: #0088CC;       /* Celeste Antioquia / Río */
+  --vf-sky-soft: #E6F5FC;
+
+  --vf-green: #008744;          /* Verde Quindío / Sierra */
+  --vf-green-soft: #E6F6ED;
+
+  --vf-ink: #111827;            /* Texto oscuro de alta legibilidad sobre blanco */
+  --vf-muted: #4B5563;          /* Texto secundario equilibrado */
+  --vf-line: #E5E7EB;           /* Líneas y bordes limpios */
+
+  --vf-success: #008744;
+  --vf-success-soft: #E6F6ED;
+  --vf-danger: #E31B23;
+  --vf-danger-soft: #FDE8E9;
+  --vf-warning: #FFBA00;
+  --vf-warning-soft: #FFF8E6;
+  --vf-info: #0050D8;
+  --vf-info-soft: #EBF2FE;
+  --vf-accent: #FF5500;
+
+  /* Cinta tricolor folclórica de Colombia */
+  --vf-colombia-stripe: linear-gradient(90deg, 
+    #FFBA00 0%, 
+    #FF5500 20%, 
+    #E31B23 40%, 
+    #0050D8 60%, 
+    #0088CC 80%, 
+    #008744 100%
+  );
+
+  /* Tipografía */
+  --vf-font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --vf-font-body: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+
+  /* Radios, sombras y espacios */
+  --vf-radius-sm: .5rem;
+  --vf-radius: .875rem;
+  --vf-radius-lg: 1.25rem;
+  --vf-radius-xl: 2rem;
+  --vf-shadow-sm: 0 2px 4px rgba(11, 30, 54, .05), 0 1px 2px rgba(11, 30, 54, .04);
+  --vf-shadow: 0 10px 30px -10px rgba(11, 30, 54, .1);
+  --vf-shadow-lg: 0 20px 50px -15px rgba(11, 30, 54, .18);
+  --vf-space-section: clamp(3.5rem, 7vw, 6.5rem);
+  --vf-transition: .2s cubic-bezier(.2, .7, .2, 1);
+  --vf-focus: 0 0 0 .25rem rgba(255, 186, 0, .45);
+
+  /* Integración con variables de Bootstrap 5.3 */
+  --bs-body-font-family: var(--vf-font-body);
+  --bs-body-color: var(--vf-ink);
+  --bs-body-bg: var(--vf-white);
+  --bs-border-color: var(--vf-line);
+  --bs-link-color: var(--vf-blue-royal);
+  --bs-link-color-rgb: 0, 80, 216;
+  --bs-link-hover-color: var(--vf-orange);
+  --bs-link-hover-color-rgb: 255, 85, 0;
+  --bs-primary: var(--vf-blue-royal);
+  --bs-primary-rgb: 0, 80, 216;
+  --bs-success-rgb: 0, 135, 68;
+  --bs-danger-rgb: 227, 27, 35;
+  --bs-border-radius: var(--vf-radius-sm);
+  --bs-border-radius-lg: var(--vf-radius);
+  --bs-focus-ring-color: rgba(255, 186, 0, .45);
+}
+
+/* -------------------------------------------------------------------------
+   2. BASE
+   ------------------------------------------------------------------------- */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--vf-font-body);
+  color: var(--vf-ink);
+  background: var(--vf-ivory);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+h1,
+h2,
+h3,
+.vf-display {
+  font-family: var(--vf-font-display);
+  font-weight: 500;
+  letter-spacing: -.015em;
+  color: var(--vf-night);
+  font-optical-sizing: auto;
+}
+
+h4,
+h5,
+h6 {
+  font-weight: 700;
+  color: var(--vf-night);
+}
+
+.text-muted,
+.vf-muted {
+  color: var(--vf-muted) !important;
+}
+
+.text-gold {
+  color: var(--vf-gold-ink) !important;
+}
+
+.text-accent {
+  color: var(--vf-accent) !important;
+}
+
+.vf-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: .75rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--vf-gold-ink);
+}
+
+.vf-eyebrow::before {
+  content: "";
+  width: 1.75rem;
+  height: 2px;
+  background: currentColor;
+  border-radius: 2px;
+}
+
+.vf-eyebrow--light {
+  color: var(--vf-gold);
+}
+
+/* Accesibilidad: enlace para saltar al contenido */
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -100px;
+  z-index: 2000;
+  padding: .75rem 1rem;
+  background: var(--vf-night);
+  color: #fff;
+  border-radius: var(--vf-radius-sm);
+  font-weight: 700;
+}
+
+.skip-link:focus {
+  top: 1rem;
+  color: #fff;
+}
+
+/* Indicadores de foco visibles (no eliminar) */
+:focus-visible {
+  outline: 3px solid var(--vf-gold);
+  outline-offset: 2px;
+}
+
+.btn:focus-visible,
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+  box-shadow: var(--vf-focus) !important;
+  border-color: var(--vf-gold);
+}
+
+main:focus {
+  outline: none;
+}
+
+/* -------------------------------------------------------------------------
+   3. BOTONES (objetivos táctiles >= 44px)
+   ------------------------------------------------------------------------- */
+.btn {
+  font-weight: 700;
+  border-radius: 999px;
+  padding: .65rem 1.35rem;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  transition: transform var(--vf-transition), box-shadow var(--vf-transition), background-color var(--vf-transition), color var(--vf-transition);
+}
+
+.btn-sm {
+  min-height: 36px;
+  padding: .4rem .9rem;
+  font-size: .85rem;
+}
+
+.btn-lg {
+  padding: .85rem 1.75rem;
+  font-size: 1.05rem;
+}
+
+.btn:not(:disabled):not(.disabled):hover {
+  transform: translateY(-1px);
+}
+
+.btn:not(:disabled):not(.disabled):active {
+  transform: translateY(0);
+}
+
+.btn-vf {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--vf-blue-royal);
+  --bs-btn-border-color: var(--vf-blue-royal);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #003CA3;
+  --bs-btn-hover-border-color: #003CA3;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--vf-night);
+  --bs-btn-active-border-color: var(--vf-night);
+  --bs-btn-disabled-color: #fff;
+  --bs-btn-disabled-bg: #8a97a6;
+  --bs-btn-disabled-border-color: #8a97a6;
+  box-shadow: 0 8px 20px -8px rgba(0, 80, 216, .5);
+}
+
+/* Botón Sol y Oro Vallenato (Eje Cafetero) */
+.btn-vf-gold,
+.btn-vf-yellow {
+  --bs-btn-color: var(--vf-night);
+  --bs-btn-bg: var(--vf-yellow);
+  --bs-btn-border-color: var(--vf-yellow);
+  --bs-btn-hover-color: var(--vf-night);
+  --bs-btn-hover-bg: #E5A700;
+  --bs-btn-hover-border-color: #E5A700;
+  --bs-btn-active-color: var(--vf-night);
+  --bs-btn-active-bg: #CC9500;
+  --bs-btn-active-border-color: #CC9500;
+  --bs-btn-disabled-color: var(--vf-muted);
+  --bs-btn-disabled-bg: var(--vf-gold-soft);
+  --bs-btn-disabled-border-color: var(--vf-gold-soft);
+  box-shadow: 0 8px 22px -8px rgba(255, 186, 0, .6);
+}
+
+/* Botón Naranja Sabor y Alegría (Risaralda) */
+.btn-vf-orange,
+.btn-vf-accent {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--vf-orange);
+  --bs-btn-border-color: var(--vf-orange);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #E04B00;
+  --bs-btn-hover-border-color: #E04B00;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #B83D00;
+  --bs-btn-active-border-color: #B83D00;
+  box-shadow: 0 8px 20px -8px rgba(255, 85, 0, .5);
+}
+
+/* Botón Azul Colonial / Valle */
+.btn-vf-royal {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--vf-blue-royal);
+  --bs-btn-border-color: var(--vf-blue-royal);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #003CA3;
+  --bs-btn-hover-border-color: #003CA3;
+  box-shadow: 0 8px 20px -8px rgba(0, 80, 216, .5);
+}
+
+/* Botón Rojo Pasión / Caldas */
+.btn-vf-red {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--vf-red);
+  --bs-btn-border-color: var(--vf-red);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #C7141C;
+  --bs-btn-hover-border-color: #C7141C;
+  box-shadow: 0 8px 20px -8px rgba(227, 27, 35, .5);
+}
+
+/* Botón Verde Esperanza / Quindío */
+.btn-vf-green {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--vf-green);
+  --bs-btn-border-color: var(--vf-green);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #007038;
+  --bs-btn-hover-border-color: #007038;
+  box-shadow: 0 8px 20px -8px rgba(0, 135, 68, .5);
+}
+
+.btn-vf-outline {
+  --bs-btn-color: var(--vf-night);
+  --bs-btn-bg: transparent;
+  --bs-btn-border-color: var(--vf-line);
+  --bs-btn-hover-color: var(--vf-blue-royal);
+  --bs-btn-hover-bg: var(--vf-blue-soft);
+  --bs-btn-hover-border-color: var(--vf-blue-royal);
+  --bs-btn-active-color: var(--vf-night);
+  --bs-btn-active-bg: var(--vf-ivory-2);
+  --bs-btn-active-border-color: var(--vf-night);
+  --bs-btn-disabled-color: var(--vf-muted);
+  --bs-btn-disabled-border-color: var(--vf-line);
+}
+
+.btn-vf-ghost-light {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: rgba(255, 255, 255, .06);
+  --bs-btn-border-color: rgba(255, 255, 255, .35);
+  --bs-btn-hover-color: var(--vf-night);
+  --bs-btn-hover-bg: #fff;
+  --bs-btn-hover-border-color: #fff;
+  --bs-btn-active-color: var(--vf-night);
+  --bs-btn-active-bg: var(--vf-gold-soft);
+  --bs-btn-active-border-color: #fff;
+}
+
+.btn-link-vf {
+  color: var(--vf-night);
+  font-weight: 700;
+  text-decoration: none;
+  padding-inline: 0;
+  border-radius: 0;
+  border-bottom: 2px solid var(--vf-gold);
+}
+
+.btn-link-vf:hover {
+  color: var(--vf-deep);
+  border-bottom-color: var(--vf-night);
+}
+
+.btn[aria-disabled="true"],
+.btn.is-locked {
+  pointer-events: auto;
+  cursor: not-allowed;
+  opacity: .55;
+}
+
+/* -------------------------------------------------------------------------
+   4. ESTADOS (icono + texto + color: nunca solo color)
+   ------------------------------------------------------------------------- */
+.vf-status {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .3rem .7rem;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 800;
+  letter-spacing: .02em;
+  line-height: 1.2;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.vf-status i {
+  font-size: .85em;
+}
+
+.vf-status--abierta {
+  background: var(--vf-success-soft);
+  color: #0F5C39;
+  border-color: #B7DFC8;
+}
+
+.vf-status--proxima {
+  background: var(--vf-info-soft);
+  color: #1C4E85;
+  border-color: #C3D6EE;
+}
+
+.vf-status--cerrada {
+  background: #ECEEF2;
+  color: #3B4556;
+  border-color: #D5D9E0;
+}
+
+.vf-status--pausada {
+  background: var(--vf-warning-soft);
+  color: #7A4E0E;
+  border-color: #F0D5A6;
+}
+
+.vf-status--borrador {
+  background: #fff;
+  color: var(--vf-muted);
+  border-color: var(--vf-line);
+  border-style: dashed;
+}
+
+.vf-status--publicado {
+  background: var(--vf-gold-soft);
+  color: #6B4C14;
+  border-color: #E8CF94;
+}
+
+.vf-status--pendiente {
+  background: #fff;
+  color: #6B4C14;
+  border-color: #E8CF94;
+  border-style: dashed;
+}
+
+.vf-status--activa {
+  background: var(--vf-success-soft);
+  color: #0F5C39;
+  border-color: #B7DFC8;
+}
+
+.vf-status--inactiva {
+  background: #ECEEF2;
+  color: #3B4556;
+  border-color: #D5D9E0;
+}
+
+.vf-status--habilitado {
+  background: var(--vf-success-soft);
+  color: #0F5C39;
+  border-color: #B7DFC8;
+}
+
+.vf-status--inhabilitado {
+  background: var(--vf-danger-soft);
+  color: #9B1C2B;
+  border-color: #F2C2C8;
+}
+
+.vf-status--simulado::after {
+  content: "simulado";
+  margin-left: .25rem;
+  padding: 0 .35rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, .08);
+  font-size: .65rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+/* Insignias Folclóricas y Culturales de Colombia (Ventanas coloniales) */
+.vf-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .3rem .75rem;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 800;
+  letter-spacing: .02em;
+  border: 1px solid transparent;
+}
+
+.vf-badge--yellow {
+  background: var(--vf-gold-soft);
+  color: #8A6200;
+  border-color: #F8D580;
+}
+
+.vf-badge--orange {
+  background: var(--vf-orange-soft);
+  color: #B83900;
+  border-color: #FFC2A8;
+}
+
+.vf-badge--red {
+  background: var(--vf-red-soft);
+  color: #A8141B;
+  border-color: #F89EA3;
+}
+
+.vf-badge--royal {
+  background: var(--vf-blue-soft);
+  color: #003CA3;
+  border-color: #ADC8FB;
+}
+
+.vf-badge--sky {
+  background: var(--vf-sky-soft);
+  color: #005C8A;
+  border-color: #99DCF8;
+}
+
+.vf-badge--green {
+  background: var(--vf-green-soft);
+  color: #00592D;
+  border-color: #99DFC0;
+}
+
+/* Etiqueta Oficial del Festival */
+.vf-festival-tag,
+.vf-demo-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .28rem .75rem;
+  border-radius: 999px;
+  background: #FFF8E6;
+  border: 1px solid #FFD875;
+  color: #8A6200;
+  font-size: .75rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.vf-festival-tag i,
+.vf-demo-tag i {
+  color: var(--vf-orange);
+  font-size: .95em;
+}
+
+/* -------------------------------------------------------------------------
+   5. TARJETAS Y SUPERFICIES (Blanco puro como base + toques coloniales)
+   ------------------------------------------------------------------------- */
+.vf-card {
+  background: var(--vf-white);
+  border: 1px solid var(--vf-line);
+  border-radius: var(--vf-radius-lg);
+  box-shadow: var(--vf-shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Cinta tricolor folclórica en cabecera de tarjeta */
+.vf-card--colombia::before,
+.card-colombia::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--vf-colombia-stripe);
+  z-index: 2;
+}
+
+/* Marcos inspirados en las ventanas coloniales */
+.vf-card--window-yellow {
+  border-top: 4px solid var(--vf-yellow);
+}
+
+.vf-card--window-orange {
+  border-top: 4px solid var(--vf-orange);
+}
+
+.vf-card--window-royal {
+  border-top: 4px solid var(--vf-blue-royal);
+}
+
+.vf-card--window-red {
+  border-top: 4px solid var(--vf-red);
+}
+
+.vf-card--window-green {
+  border-top: 4px solid var(--vf-green);
+}
+
+.vf-card--pad {
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.vf-card--hover {
+  transition: transform var(--vf-transition), box-shadow var(--vf-transition), border-color var(--vf-transition);
+}
+
+.vf-card--hover:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--vf-shadow);
+  border-color: #D1D5DB;
+}
+
+.vf-icon-circle {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: var(--vf-gold-soft);
+  color: var(--vf-gold-ink);
+  font-size: 1.25rem;
+}
+
+.vf-icon-circle--night {
+  background: var(--vf-night);
+  color: var(--vf-gold);
+}
+
+.vf-icon-circle--success {
+  background: var(--vf-success-soft);
+  color: var(--vf-success);
+}
+
+.vf-icon-circle--danger {
+  background: var(--vf-danger-soft);
+  color: var(--vf-danger);
+}
+
+/* Avatares ficticios generados (sin fotografías de personas reales) */
+.vf-avatar {
+  --vf-av-a: var(--vf-deep);
+  --vf-av-b: var(--vf-night);
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(216, 173, 85, .35), transparent 45%),
+    radial-gradient(circle at 85% 90%, rgba(180, 71, 47, .35), transparent 50%),
+    linear-gradient(135deg, var(--vf-av-a), var(--vf-av-b));
+  color: var(--vf-gold);
+  font-family: var(--vf-font-display);
+  font-size: 2.6rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+  position: relative;
+  overflow: hidden;
+}
+
+.vf-avatar::after {
+  content: "";
+  position: absolute;
+  inset: auto -10% -35% -10%;
+  height: 70%;
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, .06) 0 6px, transparent 6px 14px);
+  transform: skewY(-8deg);
+}
+
+.vf-avatar--sm {
+  width: 2.75rem;
+  height: 2.75rem;
+  aspect-ratio: auto;
+  border-radius: .75rem;
+  font-size: 1rem;
+}
+
+.vf-avatar--sm::after {
+  display: none;
+}
+
+/* Alertas con identidad */
+.vf-alert {
+  display: flex;
+  gap: .85rem;
+  align-items: flex-start;
+  padding: 1rem 1.15rem;
+  border-radius: var(--vf-radius);
+  border: 1px solid;
+  font-size: .95rem;
+}
+
+.vf-alert>i {
+  font-size: 1.25rem;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
+.vf-alert strong {
+  display: block;
+  margin-bottom: .1rem;
+}
+
+.vf-alert p:last-child {
+  margin-bottom: 0;
+}
+
+.vf-alert--info {
+  background: var(--vf-info-soft);
+  border-color: #C3D6EE;
+  color: #173E68;
+}
+
+.vf-alert--warning {
+  background: var(--vf-warning-soft);
+  border-color: #F0D5A6;
+  color: #5F3D0B;
+}
+
+.vf-alert--danger {
+  background: var(--vf-danger-soft);
+  border-color: #F2C2C8;
+  color: #7E1622;
+}
+
+.vf-alert--success {
+  background: var(--vf-success-soft);
+  border-color: #B7DFC8;
+  color: #0C4A2E;
+}
+
+.vf-alert--demo {
+  background: #FFF9EA;
+  border-color: #E8CF94;
+  border-style: dashed;
+  color: #5F430F;
+}
+
+/* -------------------------------------------------------------------------
+   6. FORMULARIOS
+   ------------------------------------------------------------------------- */
+.form-label {
+  font-weight: 700;
+  font-size: .9rem;
+  color: var(--vf-night);
+  margin-bottom: .4rem;
+}
+
+.form-label .req {
+  color: var(--vf-danger);
+  margin-left: .15rem;
+}
+
+.form-control,
+.form-select {
+  min-height: 48px;
+  border-radius: var(--vf-radius-sm);
+  border-color: #D8D1C1;
+  background-color: #fff;
+  color: var(--vf-ink);
+}
+
+.form-control::placeholder {
+  color: #98A2B3;
+}
+
+.form-text {
+  color: var(--vf-muted);
+}
+
+.vf-input-icon {
+  position: relative;
+}
+
+.vf-input-icon>i {
+  position: absolute;
+  left: .95rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--vf-muted);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.vf-input-icon>.form-control {
+  padding-left: 2.6rem;
+}
+
+.vf-input-icon .invalid-feedback {
+  padding-left: .1rem;
+}
+
+.form-check-input {
+  width: 1.2em;
+  height: 1.2em;
+  border-color: #B9B1A0;
+}
+
+.form-check-input:checked {
+  background-color: var(--vf-night);
+  border-color: var(--vf-night);
+}
+
+.invalid-feedback {
+  font-weight: 600;
+}
+
+.invalid-feedback::before {
+  content: "\F33A";
+  font-family: "bootstrap-icons";
+  margin-right: .3rem;
+  vertical-align: -1px;
+}
+
+/* -------------------------------------------------------------------------
+   7. TOASTS Y MODALES
+   ------------------------------------------------------------------------- */
+.vf-toast-region {
+  z-index: 1090;
+}
+
+.vf-toast {
+  border: 0;
+  border-radius: var(--vf-radius);
+  box-shadow: var(--vf-shadow-lg);
+  overflow: hidden;
+  min-width: min(360px, calc(100vw - 2rem));
+}
+
+.vf-toast .toast-body {
+  display: flex;
+  gap: .75rem;
+  align-items: flex-start;
+  padding: .9rem 1rem;
+  font-weight: 600;
+}
+
+.vf-toast .toast-body i {
+  font-size: 1.2rem;
+}
+
+.vf-toast--success {
+  background: #fff;
+  border-left: 5px solid var(--vf-success);
+}
+
+.vf-toast--success i {
+  color: var(--vf-success);
+}
+
+.vf-toast--danger {
+  background: #fff;
+  border-left: 5px solid var(--vf-danger);
+}
+
+.vf-toast--danger i {
+  color: var(--vf-danger);
+}
+
+.vf-toast--warning {
+  background: #fff;
+  border-left: 5px solid var(--vf-warning);
+}
+
+.vf-toast--warning i {
+  color: var(--vf-warning);
+}
+
+.vf-toast--info {
+  background: #fff;
+  border-left: 5px solid var(--vf-info);
+}
+
+.vf-toast--info i {
+  color: var(--vf-info);
+}
+
+.modal-content {
+  border: 0;
+  border-radius: var(--vf-radius-lg);
+  background: #FFFDF8;
+  box-shadow: var(--vf-shadow-lg);
+}
+
+.modal-header,
+.modal-footer {
+  border-color: var(--vf-line);
+}
+
+.modal-title {
+  font-family: var(--vf-font-display);
+  font-weight: 500;
+  font-size: 1.45rem;
+  color: var(--vf-night);
+}
+
+.modal-backdrop.show {
+  opacity: .55;
+}
+
+/* -------------------------------------------------------------------------
+   8. BARRAS DE RESULTADOS
+   ------------------------------------------------------------------------- */
+.vf-bar {
+  margin-bottom: 1rem;
+}
+
+.vf-bar__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-weight: 700;
+  font-size: .92rem;
+  margin-bottom: .35rem;
+}
+
+.vf-bar__head span:last-child {
+  font-variant-numeric: tabular-nums;
+  color: var(--vf-night);
+  white-space: nowrap;
+}
+
+.vf-bar .progress {
+  height: .85rem;
+  background: var(--vf-ivory-2);
+  border-radius: 999px;
+}
+
+.vf-bar .progress-bar {
+  background: linear-gradient(90deg, var(--vf-deep), var(--vf-night));
+  border-radius: 999px;
+  transition: width 1s cubic-bezier(.2, .7, .2, 1);
+}
+
+.vf-bar--lead .progress-bar {
+  background: linear-gradient(90deg, #C99B43, var(--vf-gold));
+}
+
+/* Tablas */
+.table {
+  --bs-table-bg: transparent;
+  --bs-table-hover-bg: rgba(216, 173, 85, .08);
+  vertical-align: middle;
+}
+
+.table>thead th {
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--vf-muted);
+  font-weight: 800;
+  border-bottom-width: 1px;
+  white-space: nowrap;
+  background: transparent;
+}
+
+.table td {
+  border-color: var(--vf-line);
+}
+
+/* Vacíos */
+.vf-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--vf-muted);
+}
+
+.vf-empty i {
+  font-size: 2.5rem;
+  color: var(--vf-gold);
+  display: block;
+  margin-bottom: .75rem;
+}
+
+/* Utilidades */
+.vf-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: .04em;
+}
+
+.vf-divider {
+  height: 1px;
+  background: var(--vf-line);
+  border: 0;
+  opacity: 1;
+}
+
+.visually-hidden-focusable:focus {
+  position: static !important;
+}
+
+/* Animación de entrada (se desactiva con movimiento reducido) */
+@keyframes vf-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.vf-reveal {
+  animation: vf-rise .6s cubic-bezier(.2, .7, .2, 1) both;
+}
+
+.vf-reveal-2 {
+  animation-delay: .08s;
+}
+
+.vf-reveal-3 {
+  animation-delay: .16s;
+}
+
+.vf-reveal-4 {
+  animation-delay: .24s;
+}
+
+/* -------------------------------------------------------------------------
+   9. MOVIMIENTO REDUCIDO
+   ------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   10. IMPRESIÓN
+   ------------------------------------------------------------------------- */
+@media print {
+
+  .no-print,
+  .vf-topbar-demo,
+  .site-header,
+  .site-footer,
+  .panel-sidebar,
+  .panel-topbar,
+  .vf-toast-region,
+  .btn {
+    display: none !important;
+  }
+
+  body {
+    background: #fff !important;
+  }
+
+  .vf-card {
+    box-shadow: none !important;
+    border-color: #999 !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  a[href]::after {
+    content: none !important;
+  }
+}
+
+.print-only {
+  display: none;
+}

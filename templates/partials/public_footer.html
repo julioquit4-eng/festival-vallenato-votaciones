@@ -1,0 +1,43 @@
+<footer class="site-footer">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <a class="vf-brand mb-3" href="{% url 'public:inicio' %}">
+          <span class="vf-brand__mark" aria-hidden="true"><i class="bi bi-music-note-beamed"></i></span>
+          <span class="vf-brand__text">
+            <span class="vf-brand__name">Festival Vallenato</span>
+            <span class="vf-brand__sub">Votaciones · 2027</span>
+          </span>
+        </a>
+        <p class="small mb-0" style="max-width: 26rem;">
+          Plataforma del Sistema Web de Votaciones para el Festival de la Leyenda Vallenata 2027 (En Construcción).
+          Celebrando la música, el folclor y la tradición vallenata de Colombia.
+        </p>
+      </div>
+      <div class="col-6 col-lg-2">
+        <h2>Portal</h2>
+        <ul>
+          <li><a href="{% url 'public:votaciones' %}">Votaciones</a></li>
+          <li><a href="{% url 'public:resultados' %}">Resultados</a></li>
+          <li><a href="{% url 'public:guia' %}">Guía de participación</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-2">
+        <h2>Información</h2>
+        <ul>
+          <li><a href="{% url 'public:privacidad' %}">Tratamiento de datos</a></li>
+          <li><a href="{% url 'public:guia' %}#preguntas">Preguntas frecuentes</a></li>
+          <li><a href="{% url 'public:login' %}" data-bs-toggle="modal" data-bs-target="#loginModal">Acceso al sistema</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-3">
+        <h2>Transparencia</h2>
+        <p class="small mb-0">Las reglas de votación, fechas y publicación de resultados son organizadas bajo los más altos estándares de autenticidad cultural y seguridad.</p>
+      </div>
+    </div>
+    <div class="site-footer__bottom d-flex flex-column flex-md-row justify-content-between gap-2">
+      <span>Festival de la Leyenda Vallenata 2027 · Valledupar, Cesar</span>
+      <span><i class="bi bi-shield-check text-warning" aria-hidden="true"></i> Plataforma Oficial en Construcción</span>
+    </div>
+  </div>
+</footer>

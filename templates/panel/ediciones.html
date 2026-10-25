@@ -1,0 +1,148 @@
+{% extends "panel/base_panel.html" %}
+{% load static %}
+
+{% block title %}Gestión de Ediciones y Categorías{% endblock %}
+{% block header_title %}Ediciones y Categorías del Festival{% endblock %}
+{% block page_id %}ediciones{% endblock %}
+{% block nav_section %}ediciones{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item active" aria-current="page">Ediciones y Categorías</li>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <!-- Columna Ediciones -->
+  <div class="col-lg-6">
+    <div class="panel-card mb-4">
+      <div class="panel-card__head">
+        <h2><i class="bi bi-calendar-event me-2"></i> Ediciones Registradas</h2>
+        <button type="button" class="btn btn-sm btn-vf" id="btnOpenNewEditionModal">
+          <i class="bi bi-plus-lg"></i> Nueva Edición
+        </button>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" id="editionsTable">
+          <thead>
+            <tr>
+              <th>Nombre / Año</th>
+              <th>Estado</th>
+              <th class="text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Render dinámico -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Columna Categorías -->
+  <div class="col-lg-6">
+    <div class="panel-card mb-4">
+      <div class="panel-card__head">
+        <h2><i class="bi bi-tags me-2"></i> Categorías de Competición</h2>
+        <button type="button" class="btn btn-sm btn-vf" id="btnOpenNewCatModal">
+          <i class="bi bi-plus-lg"></i> Nueva Categoría
+        </button>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" id="categoriesTable">
+          <thead>
+            <tr>
+              <th>Categoría</th>
+              <th>Estado</th>
+              <th class="text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Render dinámico -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Crear/Editar Edición -->
+<div class="modal fade" id="editionModal" tabindex="-1" aria-labelledby="editionModalTitle" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="editionForm" novalidate>
+        <div class="modal-header">
+          <h2 class="modal-title h5" id="editionModalTitle">Registrar Edición del Festival</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="editionNameInput" class="form-label">Nombre de la edición <span class="req">*</span></label>
+            <input type="text" class="form-control" id="editionNameInput" required placeholder="Ej: Festival de la Leyenda Vallenata 2027">
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label for="editionYearInput" class="form-label">Año <span class="req">*</span></label>
+              <input type="number" class="form-control" id="editionYearInput" required min="2020" max="2035" value="2027">
+            </div>
+            <div class="col-6">
+              <label for="editionStatusSelect" class="form-label">Estado <span class="req">*</span></label>
+              <select class="form-select" id="editionStatusSelect">
+                <option value="activa">Activa</option>
+                <option value="inactiva">Inactiva</option>
+                <option value="borrador">Borrador</option>
+              </select>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="editionDescInput" class="form-label">Descripción</label>
+            <textarea class="form-control" id="editionDescInput" rows="2" placeholder="Detalles de la edición..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-vf-outline" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-vf">Guardar edición (Demo)</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Crear/Editar Categoría -->
+<div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalTitle" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="categoryForm" novalidate>
+        <div class="modal-header">
+          <h2 class="modal-title h5" id="categoryModalTitle">Nueva Categoría</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="catNameInput" class="form-label">Nombre de categoría <span class="req">*</span></label>
+            <input type="text" class="form-control" id="catNameInput" required placeholder="Ej: Acordeonero Profesional">
+          </div>
+          <div class="mb-3">
+            <label for="catEditionSelect" class="form-label">Edición asignada <span class="req">*</span></label>
+            <select class="form-select" id="catEditionSelect">
+              <option value="ed-2027">Festival 2027</option>
+              <option value="ed-2026">Festival 2026</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="catDescInput" class="form-label">Descripción</label>
+            <textarea class="form-control" id="catDescInput" rows="2" placeholder="Criterios y descripción de la categoría..."></textarea>
+          </div>
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="catActiveCheck" checked>
+            <label class="form-check-label" for="catActiveCheck">Categoría activa para votación</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-vf-outline" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-vf">Guardar categoría (Demo)</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,286 @@
+{% extends "public/base_public.html" %}
+{% load static %}
+
+{% block title %}Inicio{% endblock %}
+{% block page_id %}inicio{% endblock %}
+{% block nav_section %}inicio{% endblock %}
+
+{% block content %}
+<!-- ============================ HERO ============================ -->
+<!-- ============================ HERO ANIMADO Y FOLCLÓRICO ============================ -->
+<section class="hero position-relative" aria-labelledby="heroTitle">
+  <!-- Forma orgánica fluida del fondo (Inspirada en Referencia 4) -->
+  <div class="hero__organic-shape" aria-hidden="true"></div>
+
+  <div class="hero__grid">
+    <!-- Columna de Texto Principal -->
+    <div class="hero__copy">
+      <!-- Badge flotante de tradición -->
+      <div class="folklore-badge-float vf-reveal">
+        <span class="badge rounded-pill bg-warning text-dark"><i class="bi bi-star-fill me-1"></i>Edición 60</span>
+        <span>Patrimonio Cultural Inmaterial · Colombia</span>
+      </div>
+
+      <h1 class="hero__title vf-reveal vf-reveal-2" id="heroTitle">
+        Siente el alma, vota por la <em style="color: var(--vf-orange);">leyenda.</em>
+      </h1>
+
+      <p class="hero__lead vf-reveal vf-reveal-3">
+        El certamen folclórico más emblemático de Colombia donde tú eliges a tus favoritos. 
+        Cuatro aires vallenatos, una sola voz: <strong>Paseo, Merengue, Son y Puya</strong>.
+      </p>
+
+      <div class="d-flex flex-wrap gap-3 align-items-center mt-4 vf-reveal vf-reveal-4">
+        <!-- Disparador del Modal de Acceso del Votante -->
+        <button type="button" class="btn btn-vf btn-lg" data-bs-toggle="modal" data-bs-target="#voterAccessModal" id="heroCtaVotar">
+          <i class="bi bi-box-arrow-in-right me-1"></i> Ingresar a votar
+        </button>
+        <!-- Disparador del Modal de Inicio de Sesión -->
+        <button type="button" class="btn btn-vf-outline btn-lg" data-bs-toggle="modal" data-bs-target="#loginModal" id="heroCtaLogin">
+          <i class="bi bi-person-circle me-1"></i> Iniciar sesión
+        </button>
+        <a class="btn-link-vf ms-lg-2" href="{% url 'public:guia' %}">¿Cómo funciona?</a>
+      </div>
+
+      <div class="hero__meta vf-reveal vf-reveal-4 mt-4">
+        <span><i class="bi bi-shield-check text-success"></i>Voto único y secreto</span>
+        <span><i class="bi bi-phone text-primary"></i>Optimizado para móviles</span>
+        <span><i class="bi bi-award text-warning"></i>Resultados auditados</span>
+      </div>
+    </div>
+
+    <!-- Columna Visual: Slider Interactivo de Tradición (Inspirado en Referencias 1 y 3) -->
+    <div class="hero__visual position-relative">
+      <!-- Sticker Flotante 1: Sombrero Vueltiao (Referencia 2 y 4) -->
+      <div class="folklore-sticker folklore-sticker--sombrero d-none d-sm-flex" title="¡Símbolo de la colombianidad!">
+        <span style="font-size: 1.4rem;">👒</span>
+        <div class="lh-1 text-start">
+          <strong class="d-block text-dark" style="font-size: 0.8rem;">¡Ay, hombe!</strong>
+          <small class="text-muted" style="font-size: 0.68rem;">Sombrero Vueltiao</small>
+        </div>
+      </div>
+
+      <!-- Sticker Flotante 2: Parranda y Danza (Referencia 1 y 2) -->
+      <div class="folklore-sticker folklore-sticker--pilon d-none d-sm-flex" title="Danza tradicional del Pilón">
+        <span style="font-size: 1.4rem;">💃</span>
+        <div class="lh-1 text-start">
+          <strong class="d-block text-dark" style="font-size: 0.8rem;">El Pilón Vallenato</strong>
+          <small class="text-muted" style="font-size: 0.68rem;">Alegría y Polleras</small>
+        </div>
+      </div>
+
+      <!-- Tarjeta Principal del Slider de Experiencias -->
+      <div class="hero-slider-wrap">
+        <div class="hero-slider-card" id="heroSlideCard">
+          <img src="{% static 'img/hero-acordeon.jpg' %}" id="heroSlideImg" alt="Acordeón vallenato en balcón colonial" width="900" height="600">
+          <div class="hero-slider-card__content">
+            <span class="vf-badge vf-badge--yellow mb-1" id="heroSlideBadge">
+              <i class="bi bi-music-note-beamed"></i> Aire de Paseo
+            </span>
+            <h2 class="hero-slider-card__title" id="heroSlideTitle">La Majestad del Acordeón</h2>
+            <p class="hero-slider-card__desc" id="heroSlideDesc">
+              Los grandes juglares compiten por la corona del Festival en la mítica plaza Alfonso López.
+            </p>
+            <div class="d-flex align-items-center gap-2">
+              <button type="button" class="btn btn-vf-gold btn-sm" data-bs-toggle="modal" data-bs-target="#voterAccessModal">
+                Votar en esta categoría <i class="bi bi-arrow-right ms-1"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controles de Navegación del Slider (Inspirados en Referencia 3) -->
+        <div class="hero-slider-controls">
+          <div class="d-flex align-items-center gap-2">
+            <button type="button" class="hero-slider-btn" id="heroSliderPrev" aria-label="Experiencia anterior">
+              <i class="bi bi-chevron-left"></i>
+            </button>
+            <button type="button" class="hero-slider-btn" id="heroSliderNext" aria-label="Experiencia siguiente">
+              <i class="bi bi-chevron-right"></i>
+            </button>
+            <span class="hero-slider-counter ms-2" id="heroSliderCounter">01 / 04</span>
+          </div>
+
+          <!-- Indicadores de barra -->
+          <div class="hero-slider-dots" id="heroSliderDots">
+            <button class="hero-slider-dot is-active" data-slide="0" aria-label="Ir a diapositiva 1"></button>
+            <button class="hero-slider-dot" data-slide="1" aria-label="Ir a diapositiva 2"></button>
+            <button class="hero-slider-dot" data-slide="2" aria-label="Ir a diapositiva 3"></button>
+            <button class="hero-slider-dot" data-slide="3" aria-label="Ir a diapositiva 4"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= VIÑETAS FOLCLÓRICAS DE COLOMBIA ======================= -->
+<!-- Inspiradas en la Referencia de Ilustraciones Tradicionales (Imagen 1) -->
+<section class="cultural-vignettes" aria-label="Pilares de la Tradición Vallenata">
+  <div class="container">
+    <div class="row g-3 g-lg-4">
+      <!-- Viñeta 1: El Acordeón (Amarillo / Eje Cafetero) -->
+      <div class="col-6 col-lg-3">
+        <div class="vignette-card vignette-card--yellow">
+          <div class="vignette-icon"><i class="bi bi-music-note-beamed"></i></div>
+          <div class="lh-sm">
+            <strong class="d-block text-dark fw-bold" style="font-size: 0.95rem;">Rey Vallenato</strong>
+            <small class="text-muted" style="font-size: 0.78rem;">Acordeón, caja y guacharaca</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Viñeta 2: Danza y Piloneras (Azul / Valle) -->
+      <div class="col-6 col-lg-3">
+        <div class="vignette-card vignette-card--royal">
+          <div class="vignette-icon"><i class="bi bi-people-fill"></i></div>
+          <div class="lh-sm">
+            <strong class="d-block text-dark fw-bold" style="font-size: 0.95rem;">El Pilón Vallenato</strong>
+            <small class="text-muted" style="font-size: 0.78rem;">Danza, fiesta y tradición</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Viñeta 3: Verso y Piqueria (Naranja / Risaralda) -->
+      <div class="col-6 col-lg-3">
+        <div class="vignette-card vignette-card--orange">
+          <div class="vignette-icon"><i class="bi bi-chat-quote-fill"></i></div>
+          <div class="lh-sm">
+            <strong class="d-block text-dark fw-bold" style="font-size: 0.95rem;">Piqueria Mayor</strong>
+            <small class="text-muted" style="font-size: 0.78rem;">Repentismo y coplas al viento</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Viñeta 4: La Tierra del Cacique (Verde / Quindío) -->
+      <div class="col-6 col-lg-3">
+        <div class="vignette-card vignette-card--green">
+          <div class="vignette-icon"><i class="bi bi-tree-fill"></i></div>
+          <div class="lh-sm">
+            <strong class="d-block text-dark fw-bold" style="font-size: 0.95rem;">Tierra de Cantores</strong>
+            <small class="text-muted" style="font-size: 0.78rem;">Canción inédita y poesía</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= VOTACIONES DESTACADAS ======================= -->
+<section class="section" aria-labelledby="votacionesTitle">
+  <div class="container">
+    <div class="row align-items-end g-4 mb-4 mb-lg-5">
+      <div class="col-lg-6">
+        <span class="vf-eyebrow">Participa con Sabor y Tradición</span>
+        <h2 class="section__title" id="votacionesTitle">Votaciones de esta edición</h2>
+      </div>
+      <div class="col-lg-6">
+        <p class="section__lead mb-2">Consulta cada categoría, conoce las opciones habilitadas y vota durante el periodo autorizado por la organización.</p>
+        <span class="vf-badge vf-badge--yellow"><i class="bi bi-music-note-beamed" aria-hidden="true"></i>Edición 60 · 2027</span>
+      </div>
+    </div>
+
+    {% comment %}
+      PUNTO DE INTEGRACIÓN: en Django, reemplazar el render JS por un bucle:
+      {% for votacion in votaciones_destacadas %} {% include "partials/vote_card.html" %} {% endfor %}
+    {% endcomment %}
+    <div class="row g-4" id="featuredVotes" aria-live="polite">
+      <div class="col-12"><div class="vf-empty"><i class="bi bi-hourglass" aria-hidden="true"></i>Cargando votaciones…</div></div>
+    </div>
+    <noscript><p class="vf-alert vf-alert--warning mt-3">Activa JavaScript para disfrutar de todas las funciones del sistema.</p></noscript>
+
+    <div class="text-center mt-5">
+      <a class="btn btn-vf-outline btn-lg" href="{% url 'public:votaciones' %}">Ver todas las votaciones <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ PASOS ============================ -->
+<section class="section section--dark" aria-labelledby="pasosTitle">
+  <div class="container">
+    <div class="row g-5 align-items-center">
+      <div class="col-lg-4">
+        <span class="vf-eyebrow vf-eyebrow--light">Proceso de votación</span>
+        <h2 class="section__title" id="pasosTitle">Claro, seguro y en tres pasos</h2>
+        <p class="section__lead">Solo las personas registradas en el padrón autorizado podrán votar. Tu información se trata conforme a la política de datos personales.</p>
+        <a class="btn btn-vf-gold mt-2" href="{% url 'public:guia' %}">Leer la guía completa</a>
+      </div>
+      <div class="col-lg-8">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <article class="step-card">
+              <span class="step-card__num" aria-hidden="true">01</span>
+              <span class="vf-icon-circle"><i class="bi bi-person-vcard" aria-hidden="true"></i></span>
+              <h3>Valida tu acceso</h3>
+              <p>Ingresa tu cédula y correo. La organización confirma si estás habilitado en el padrón.</p>
+            </article>
+          </div>
+          <div class="col-md-4">
+            <article class="step-card">
+              <span class="step-card__num" aria-hidden="true">02</span>
+              <span class="vf-icon-circle"><i class="bi bi-hand-index-thumb" aria-hidden="true"></i></span>
+              <h3>Elige tu favorito</h3>
+              <p>Revisa las opciones de la votación abierta y selecciona una sola preferencia.</p>
+            </article>
+          </div>
+          <div class="col-md-4">
+            <article class="step-card">
+              <span class="step-card__num" aria-hidden="true">03</span>
+              <span class="vf-icon-circle"><i class="bi bi-patch-check" aria-hidden="true"></i></span>
+              <h3>Confirma tu voto</h3>
+              <p>Verifica el resumen y confirma. Una vez registrado, el voto es definitivo.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ PROPÓSITO ============================ -->
+<section class="section" aria-labelledby="propositoTitle">
+  <div class="container">
+    <div class="row g-5 align-items-center">
+      <div class="col-lg-6 order-lg-2">
+        <figure class="vf-photo mb-0" style="aspect-ratio: 16/11;">
+          <img src="{% static 'img/paisaje-cesar.jpg' %}" alt="Valle verde atravesado por un río, con montañas nevadas al fondo al amanecer" loading="lazy" width="1376" height="768">
+          <figcaption>Paisaje ilustrativo del Cesar</figcaption>
+        </figure>
+      </div>
+      <div class="col-lg-6">
+        <span class="vf-eyebrow">Propósito de la plataforma</span>
+        <h2 class="section__title" id="propositoTitle">Una tradición que se escucha, ahora también se vota</h2>
+        <p class="section__lead">Esta plataforma busca acercar al público al Festival permitiendo participar en votaciones habilitadas por la organización, con reglas visibles y resultados publicados solo cuando han sido validados.</p>
+        <ul class="list-unstyled mt-4 d-grid gap-3">
+          <li class="d-flex gap-3"><span class="vf-icon-circle"><i class="bi bi-people" aria-hidden="true"></i></span><div><strong>Participación ciudadana</strong><br><span class="text-muted">Votaciones del público por categoría.</span></div></li>
+          <li class="d-flex gap-3"><span class="vf-icon-circle"><i class="bi bi-shield-check" aria-hidden="true"></i></span><div><strong>Protección de datos</strong><br><span class="text-muted">Solo se solicitan los datos necesarios para validar el acceso.</span></div></li>
+          <li class="d-flex gap-3"><span class="vf-icon-circle"><i class="bi bi-clipboard-data" aria-hidden="true"></i></span><div><strong>Trazabilidad</strong><br><span class="text-muted">Resultados consolidados tras el cierre de cada votación.</span></div></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ RESULTADOS ============================ -->
+<section class="section section--paper" aria-labelledby="resultadosTitle">
+  <div class="container">
+    <div class="row g-5 align-items-center">
+      <div class="col-lg-6">
+        <span class="vf-eyebrow">Transparencia</span>
+        <h2 class="section__title" id="resultadosTitle">Resultados confiables, cultura que nos une</h2>
+        <p class="section__lead">Los resultados oficiales se publican después del cierre y la validación de cada votación por parte de la organización.</p>
+        <p class="d-flex align-items-center gap-2 mt-4 mb-0 small fw-semibold text-muted"><i class="bi bi-calendar-event text-gold fs-5" aria-hidden="true"></i>Las fechas de publicación dependen del calendario aprobado.</p>
+      </div>
+      <div class="col-lg-5 offset-lg-1">
+        <div class="teaser-locked" id="resultsTeaser">
+          <span class="vf-icon-circle vf-icon-circle--night mb-3"><i class="bi bi-lock" aria-hidden="true"></i></span>
+          <p class="vf-eyebrow justify-content-center mb-1">Cuenta regresiva</p>
+          <h3 class="h2 mb-2">Resultados en preparación</h3>
+          <p class="text-muted mb-4" data-teaser-text>Consulta qué votaciones ya tienen resultados publicados.</p>
+          <a class="btn btn-vf-outline" href="{% url 'public:resultados' %}">Consultar resultados <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

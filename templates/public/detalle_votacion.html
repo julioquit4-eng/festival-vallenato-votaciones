@@ -1,0 +1,99 @@
+{% extends "public/base_public.html" %}
+{% load static %}
+
+{% block title %}Selección de opción{% endblock %}
+{% block page_id %}detalle_votacion{% endblock %}
+{% block nav_section %}votaciones{% endblock %}
+
+{% block content %}
+<header class="page-hero">
+  <div class="container">
+    <nav aria-label="Miga de pan">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'public:inicio' %}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'public:votaciones' %}">Votaciones</a></li>
+        <li class="breadcrumb-item active" aria-current="page" id="breadcrumbCurrentVote">Detalle</li>
+      </ol>
+    </nav>
+    <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+      <span class="vf-eyebrow vf-eyebrow--light" id="voteCategoryBadge">Categoría</span>
+      <span id="voteStatusBadgeContainer"></span>
+      <span class="vf-badge vf-badge--orange"><i class="bi bi-shield-lock" aria-hidden="true"></i>Voto Seguro</span>
+    </div>
+    <h1 id="voteTitle">Cargando votación...</h1>
+    <p id="voteDescription" class="mb-3">Información sobre el proceso y selección exclusiva.</p>
+    <div class="d-flex flex-wrap gap-3 small text-muted">
+      <span id="voteDatesInfo"><i class="bi bi-clock me-1"></i>Periodo de votación</span>
+      <span><i class="bi bi-check2-circle me-1"></i>Selección única</span>
+    </div>
+  </div>
+</header>
+
+<div class="container my-5">
+  <!-- Stepper de Progreso -->
+  <ol class="vf-stepper" aria-label="Progreso del proceso de votación">
+    <li class="is-current" aria-current="step">
+      <span class="dot">1</span>
+      <span>Seleccionar opción</span>
+    </li>
+    <li>
+      <span class="dot">2</span>
+      <span>Validar identidad</span>
+    </li>
+    <li>
+      <span class="dot">3</span>
+      <span>Confirmar voto</span>
+    </li>
+    <li>
+      <span class="dot">4</span>
+      <span>Comprobante</span>
+    </li>
+  </ol>
+
+  <!-- Alerta informativa si la votación no está abierta -->
+  <div id="voteNotOpenAlert" class="vf-alert vf-alert--warning d-none mb-4" role="alert">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    <div>
+      <strong id="voteNotOpenTitle">Votación no habilitada para recibir votos</strong>
+      <p id="voteNotOpenText" class="mb-0">Solo puedes consultar las opciones con fines informativos. No es posible continuar con la selección.</p>
+    </div>
+  </div>
+
+  <form id="voteSelectionForm" novalidate>
+    <fieldset class="options-fieldset mb-4" id="optionsFieldset">
+      <legend class="h4 mb-3 d-flex justify-content-between align-items-center">
+        <span>Opciones o candidatos participantes</span>
+        <small class="text-muted fs-6 fw-normal">Selecciona una opción</small>
+      </legend>
+
+      <div class="row g-4" id="candidatesGrid">
+        <!-- Render dinámico desde voting.js -->
+        <div class="col-12 text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando opciones...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="invalid-feedback d-block mt-3 fs-6" id="selectionErrorMsg" style="display: none !important;">
+        Debes seleccionar una opción antes de continuar.
+      </div>
+    </fieldset>
+
+    <!-- Barra de acciones fija en pie de página o contenedor inferior -->
+    <div class="vote-actionbar">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <a href="{% url 'public:votaciones' %}" class="btn btn-vf-outline">
+          <i class="bi bi-arrow-left"></i> Volver a votaciones
+        </a>
+        <div class="d-flex align-items-center gap-3">
+          <span class="text-muted small d-none d-sm-inline" id="selectedOptionSummaryText">Ninguna opción seleccionada</span>
+          <button type="submit" class="btn btn-vf btn-lg" id="btnContinueSelection">
+            Continuar a validación <i class="bi bi-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "public/base_public.html" %}
+{% load static %}
+
+{% block title %}Resultados públicos autorizados{% endblock %}
+{% block page_id %}resultados{% endblock %}
+{% block nav_section %}resultados{% endblock %}
+
+{% block content %}
+<header class="page-hero">
+  <div class="container">
+    <nav aria-label="Miga de pan">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'public:inicio' %}">Inicio</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Resultados</li>
+      </ol>
+    </nav>
+    <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+      <span class="vf-eyebrow vf-eyebrow--light">Transparencia electoral</span>
+      <span class="vf-badge vf-badge--green"><i class="bi bi-shield-check"></i>Escrutinio Oficial</span>
+    </div>
+    <h1>Escrutinio y Resultados Públicos</h1>
+    <p>Consulta los resultados de las votaciones concluidas y debidamente autorizadas por la organización del certamen. Las votaciones activas o en proceso no exhiben conteos previos para resguardar la neutralidad del sufragio.</p>
+  </div>
+</header>
+
+<div class="container my-5">
+  <!-- Filtro por Edición y Categoría -->
+  <div class="filter-bar mb-5">
+    <div class="row g-3">
+      <div class="col-md-6 col-lg-4">
+        <label for="resultsEditionSelect" class="form-label small text-muted text-uppercase fw-bold">Edición del Festival</label>
+        <select class="form-select" id="resultsEditionSelect">
+          <option value="ed-2027" selected>Festival de la Leyenda Vallenata 2027 (Edición Actual)</option>
+          <option value="ed-2026">Edición 2026 (Histórico Anterior)</option>
+        </select>
+      </div>
+      <div class="col-md-6 col-lg-8 d-flex align-items-end">
+        <div class="small text-muted pb-2">
+          <i class="bi bi-info-circle text-primary me-1"></i> Mostrando únicamente votaciones cuyo estado sea <strong>Cerrada</strong> y cuenten con <strong>Resultados Publicados</strong>.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenedor de Resultados -->
+  <div id="resultsListContainer">
+    <!-- Renderizado dinámicamente con voting.js -->
+    <div class="col-12 text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando resultados...</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

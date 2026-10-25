@@ -1,0 +1,95 @@
+{% extends "panel/base_panel.html" %}
+{% load static %}
+
+{% block title %}Gestión de Opciones y Candidatos{% endblock %}
+{% block header_title %}Candidatos y Opciones de Votación{% endblock %}
+{% block page_id %}opciones{% endblock %}
+{% block nav_section %}opciones{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item active" aria-current="page">Opciones y Candidatos</li>
+{% endblock %}
+
+{% block content %}
+<div class="panel-card mb-4">
+  <div class="panel-card__head">
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+      <h2><i class="bi bi-person-lines-fill me-2 text-primary"></i> Filtrar Opciones por Proceso</h2>
+      <div class="d-flex gap-2">
+        <select class="form-select form-select-sm" id="optFilterVoteSelect" style="max-width: 320px;">
+          <!-- Llenado dinámico con admin.js -->
+        </select>
+      </div>
+    </div>
+    <button type="button" class="btn btn-sm btn-vf" id="btnOpenNewOptionModal">
+      <i class="bi bi-plus-lg"></i> Agregar Candidato u Opción
+    </button>
+  </div>
+
+  <div class="panel-card__body py-2">
+    <!-- Regla de Negocio: Restricción si el proceso está ABIERTO -->
+    <div class="vf-alert vf-alert--warning d-none mb-3" id="alertVoteActiveWarning">
+      <i class="bi bi-lock-fill fs-5"></i>
+      <div>
+        <strong>Regla de integridad electoral activa:</strong>
+        <p class="small mb-0">Esta votación se encuentra <strong>Abierta al público</strong>. Por reglamento del Festival, los candidatos y opciones no pueden ser editados ni eliminados mientras el proceso electoral permanezca activo.</p>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0" id="optionsAdminTable">
+        <thead>
+          <tr>
+            <th>Candidato / Opción</th>
+            <th>Votación asignada</th>
+            <th>Atributos / Géneros</th>
+            <th>Estado</th>
+            <th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Render dinámico -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nueva Opción -->
+<div class="modal fade" id="optionModal" tabindex="-1" aria-labelledby="optionModalTitle" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="optionForm" novalidate>
+        <div class="modal-header">
+          <h2 class="modal-title h5" id="optionModalTitle">Registrar Candidato u Opción</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="optNameInput" class="form-label">Nombre completo / Agrupación <span class="req">*</span></label>
+            <input type="text" class="form-control" id="optNameInput" required placeholder="Ej: Mateo Larrañaga">
+          </div>
+          <div class="mb-3">
+            <label for="optVoteAssignSelect" class="form-label">Votación a la que pertenece <span class="req">*</span></label>
+            <select class="form-select" id="optVoteAssignSelect" required>
+              <!-- Dinámico -->
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="optDescInput" class="form-label">Reseña o descripción</label>
+            <textarea class="form-control" id="optDescInput" rows="2" placeholder="Trayectoria o méritos artísticos..."></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="optTagsInput" class="form-label">Etiquetas o géneros (separados por coma)</label>
+            <input type="text" class="form-control" id="optTagsInput" placeholder="Ej: Paseo, Merengue">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-vf-outline" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-vf">Guardar participante (Demo)</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

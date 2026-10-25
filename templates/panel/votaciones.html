@@ -1,0 +1,94 @@
+{% extends "panel/base_panel.html" %}
+{% load static %}
+
+{% block title %}Gestión de Votaciones{% endblock %}
+{% block header_title %}Procesos de Votación{% endblock %}
+{% block page_id %}votaciones_admin{% endblock %}
+{% block nav_section %}votaciones{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item active" aria-current="page">Procesos de Votación</li>
+{% endblock %}
+
+{% block content %}
+<div class="panel-card mb-4">
+  <div class="panel-card__head">
+    <h2><i class="bi bi-ui-checks-grid me-2 text-primary"></i> Todos los Procesos de Votación</h2>
+    <button type="button" class="btn btn-sm btn-vf" id="btnOpenNewVoteProcessModal">
+      <i class="bi bi-plus-lg"></i> Crear Nuevo Proceso
+    </button>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0" id="adminVotesTable">
+      <thead>
+        <tr>
+          <th>Votación</th>
+          <th>Categoría</th>
+          <th>Apertura</th>
+          <th>Cierre</th>
+          <th>Estado</th>
+          <th class="text-end">Operaciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Renderizado dinámico -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal Crear/Editar Proceso de Votación -->
+<div class="modal fade" id="voteProcessModal" tabindex="-1" aria-labelledby="voteProcessModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form id="voteProcessForm" novalidate>
+        <div class="modal-header">
+          <h2 class="modal-title h5" id="voteProcessModalTitle">Configurar Proceso de Votación</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="vpTitleInput" class="form-label">Título de la votación <span class="req">*</span></label>
+              <input type="text" class="form-control" id="vpTitleInput" required placeholder="Ej: Favorito del público: Acordeonero">
+            </div>
+            <div class="col-md-6">
+              <label for="vpCategorySelect" class="form-label">Categoría asignada <span class="req">*</span></label>
+              <select class="form-select" id="vpCategorySelect" required>
+                <!-- Opciones dinámicas -->
+              </select>
+            </div>
+            <div class="col-12">
+              <label for="vpDescInput" class="form-label">Descripción orientativa para el votante</label>
+              <textarea class="form-control" id="vpDescInput" rows="2"></textarea>
+            </div>
+            <div class="col-md-6">
+              <label for="vpStartDateInput" class="form-label">Fecha y hora de apertura <span class="req">*</span></label>
+              <input type="datetime-local" class="form-control" id="vpStartDateInput" required>
+            </div>
+            <div class="col-md-6">
+              <label for="vpEndDateInput" class="form-label">Fecha y hora de cierre <span class="req">*</span></label>
+              <input type="datetime-local" class="form-control" id="vpEndDateInput" required>
+              <div class="invalid-feedback" id="dateOrderFeedback">La fecha de cierre debe ser posterior a la de apertura.</div>
+            </div>
+            <div class="col-md-6">
+              <label for="vpStatusSelect" class="form-label">Estado inicial <span class="req">*</span></label>
+              <select class="form-select" id="vpStatusSelect">
+                <option value="borrador">Borrador</option>
+                <option value="proxima">Próximamente</option>
+                <option value="abierta">Abierta</option>
+                <option value="pausada">Pausada</option>
+                <option value="cerrada">Cerrada</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-vf-outline" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-vf">Guardar proceso (Demo)</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

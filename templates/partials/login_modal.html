@@ -1,0 +1,162 @@
+<!-- ==========================================================================
+     Modal de Inicio de Sesión (Votante vs Administrador)
+     ========================================================================== -->
+<div class="modal fade modal-voter" id="loginModal" tabindex="-1" aria-labelledby="loginModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+    <div class="modal-content shadow-lg border-0">
+      
+      <!-- Botón de cierre superior -->
+      <div class="modal-header border-0 pb-0">
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar modal"></button>
+      </div>
+
+      <div class="modal-body px-3 px-sm-4 pt-1 pb-4">
+        <div class="text-center mb-3">
+          <span class="vf-brand__mark mx-auto mb-2" style="width: 3.2rem; height: 3.2rem; font-size: 1.35rem;">
+            <i class="bi bi-person-badge"></i>
+          </span>
+          <h2 class="h4 fw-bold mb-1 text-dark" id="loginModalTitle" style="font-family: var(--vf-font-display);">Iniciar Sesión</h2>
+          <p class="text-muted small mb-3">Selecciona tu perfil para ingresar al sistema electoral</p>
+        </div>
+
+        <!-- Selector de Rol: Votante vs Administrador -->
+        <ul class="nav nav-pills nav-fill mb-3 p-1 rounded-pill border" id="modalLoginTabs" role="tablist" style="background: var(--vf-ivory-2);">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active rounded-pill fw-bold py-2 small" id="modal-tab-voter" data-bs-toggle="pill" data-bs-target="#modal-pane-voter" type="button" role="tab" aria-controls="modal-pane-voter" aria-selected="true">
+              <i class="bi bi-person-check me-1"></i> Votante
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-pill fw-bold py-2 small" id="modal-tab-admin" data-bs-toggle="pill" data-bs-target="#modal-pane-admin" type="button" role="tab" aria-controls="modal-pane-admin" aria-selected="false">
+              <i class="bi bi-shield-shaded me-1"></i> Administrador
+            </button>
+          </li>
+        </ul>
+
+        <div class="tab-content" id="modalLoginTabsContent">
+          <!-- ================= PESTAÑA VOTANTE ================= -->
+          <div class="tab-pane fade show active" id="modal-pane-voter" role="tabpanel" aria-labelledby="modal-tab-voter">
+            <div class="vf-alert vf-alert--info mb-3 py-2 px-3">
+              <i class="bi bi-info-circle fs-6 text-primary"></i>
+              <div style="font-size: 0.78rem;">
+                <strong>Acceso Votante:</strong> Validación automática contra el censo electoral oficial. No requiere contraseña previa.
+              </div>
+            </div>
+
+            <form id="modalVoterLoginForm" novalidate>
+              <div class="mb-3">
+                <label for="modalLoginCedula" class="form-label small fw-bold">Número de cédula <span class="req">*</span></label>
+                <div class="vf-input-icon">
+                  <i class="bi bi-person-vcard"></i>
+                  <input type="text" 
+                         class="form-control" 
+                         id="modalLoginCedula" 
+                         name="cedula" 
+                         placeholder="Ej. 1.065.123.456" 
+                         required 
+                         pattern="[0-9]{6,12}" 
+                         data-msg-required="Ingresa tu cédula." 
+                         data-msg-pattern="Ingresa entre 6 y 12 dígitos.">
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="modalLoginCorreo" class="form-label small fw-bold">Correo registrado <span class="req">*</span></label>
+                <div class="vf-input-icon">
+                  <i class="bi bi-envelope"></i>
+                  <input type="email" 
+                         class="form-control" 
+                         id="modalLoginCorreo" 
+                         name="correo" 
+                         placeholder="nombre@correo.com" 
+                         required 
+                         data-msg-required="Ingresa tu correo registrado." 
+                         data-msg-type="Ingresa un correo válido.">
+                </div>
+              </div>
+
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="modalLoginHabeas" name="habeas_data" required data-msg-required="Debes aceptar el tratamiento de datos.">
+                <label class="form-check-label small text-muted" for="modalLoginHabeas" style="font-size: 0.78rem;">
+                  Acepto el <a href="{% url 'public:privacidad' %}" target="_blank">tratamiento de datos y voto secreto</a>. <span class="req">*</span>
+                </label>
+              </div>
+
+              <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-vf btn-lg w-100" id="btnSubmitModalVoterLogin">
+                  Ingresar a votar <i class="bi bi-arrow-right ms-1"></i>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- ================= PESTAÑA ADMINISTRADOR ================= -->
+          <div class="tab-pane fade" id="modal-pane-admin" role="tabpanel" aria-labelledby="modal-tab-admin">
+            <div class="vf-alert vf-alert--warning mb-3 py-2 px-3">
+              <i class="bi bi-shield-lock fs-6 text-warning"></i>
+              <div style="font-size: 0.78rem;">
+                <strong>Área Administrativa:</strong> Exclusivo para miembros del comité organizador y auditoría técnica.
+              </div>
+            </div>
+
+            <form id="modalAdminLoginForm" novalidate>
+              <div class="mb-3">
+                <label for="modalAdminUser" class="form-label small fw-bold">Usuario administrativo <span class="req">*</span></label>
+                <div class="vf-input-icon">
+                  <i class="bi bi-person-fill-lock"></i>
+                  <input type="text" 
+                         class="form-control" 
+                         id="modalAdminUser" 
+                         name="username" 
+                         placeholder="admin@festivalvallenato.com" 
+                         required 
+                         data-msg-required="Ingresa tu usuario institucional.">
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="modalAdminPass" class="form-label small fw-bold">Contraseña <span class="req">*</span></label>
+                <div class="input-group">
+                  <div class="vf-input-icon flex-grow-1">
+                    <i class="bi bi-key-fill"></i>
+                    <input type="password" 
+                           class="form-control" 
+                           id="modalAdminPass" 
+                           name="password" 
+                           placeholder="••••••••••••" 
+                           required 
+                           data-msg-required="Ingresa tu contraseña de acceso.">
+                  </div>
+                  <button class="btn btn-outline-secondary" type="button" data-toggle-password="modalAdminPass" aria-label="Mostrar u ocultar contraseña">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="modalRememberAdmin">
+                  <label class="form-check-label small text-muted" for="modalRememberAdmin" style="font-size: 0.78rem;">Recordar sesión</label>
+                </div>
+                <a href="#" class="small text-muted text-decoration-none" style="font-size: 0.78rem;" data-not-implemented="Contacta a la comisión técnica del certamen para restablecer tus credenciales.">¿Olvidaste tu clave?</a>
+              </div>
+
+              <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-vf btn-lg w-100" id="btnSubmitModalAdminLogin">
+                  <i class="bi bi-box-arrow-in-right me-1"></i> Entrar al Panel de Control
+                </button>
+              </div>
+
+              <div class="mt-3 p-2 rounded bg-light border text-center">
+                <small class="text-muted" style="font-size:0.72rem;">
+                  <i class="bi bi-info-circle me-1"></i><strong>Acceso rápido:</strong> usuario <code>admin</code> / cualquier clave.
+                </small>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

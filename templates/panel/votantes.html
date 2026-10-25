@@ -1,0 +1,92 @@
+{% extends "panel/base_panel.html" %}
+{% load static %}
+
+{% block title %}Censo y Padrón Electoral{% endblock %}
+{% block header_title %}Padrón Oficial de Votantes{% endblock %}
+{% block page_id %}votantes{% endblock %}
+{% block nav_section %}votantes{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item active" aria-current="page">Padrón Electoral</li>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <!-- Zona de Carga Masiva (CSV) -->
+  <div class="col-lg-5">
+    <div class="panel-card mb-4">
+      <div class="panel-card__head">
+        <h2><i class="bi bi-file-earmark-arrow-up me-2 text-primary"></i> Carga Masiva de Votantes (CSV)</h2>
+      </div>
+      <div class="panel-card__body">
+        <p class="small text-muted mb-3">
+          Sube la base de datos con los votantes autorizados para la edición 2027. El archivo debe contener columnas de <code>documento</code> y <code>correo</code>.
+        </p>
+
+        <form id="csvUploadForm">
+          <div class="dropzone mb-3" id="csvDropzone">
+            <i class="bi bi-cloud-arrow-up d-block mb-2"></i>
+            <span class="d-block fw-bold mb-1">Arrastra tu archivo CSV aquí</span>
+            <span class="small text-muted d-block mb-3">o presiona para examinar en tu equipo</span>
+            <input type="file" id="csvFileInput" accept=".csv" class="d-none">
+            <button type="button" class="btn btn-sm btn-vf-outline" onclick="document.getElementById('csvFileInput').click()">
+              Seleccionar archivo .CSV
+            </button>
+            <div id="selectedFileName" class="mt-2 small fw-bold text-success d-none"></div>
+          </div>
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-vf" id="btnSimulateUpload" disabled>
+              <i class="bi bi-gear-wide-connected me-1"></i> Simular procesamiento de archivo
+            </button>
+          </div>
+        </form>
+
+        <!-- Resumen de Validación Simulado -->
+        <div id="uploadSummaryBox" class="mt-4 p-3 bg-light rounded-3 border d-none">
+          <h3 class="h6 mb-2 fw-bold text-dark"><i class="bi bi-check-circle-fill text-success me-1"></i> Resultado del Análisis (Simulado):</h3>
+          <ul class="list-unstyled small mb-2">
+            <li><strong class="text-success">Filas válidas leídas:</strong> 118 registros</li>
+            <li><strong class="text-danger">Filas con inconsistencias:</strong> 7 registros</li>
+          </ul>
+          <div class="alert alert-warning py-2 px-3 small mb-0">
+            <strong>Observaciones:</strong> 3 correos con sintaxis inválida, 2 cédulas vacías y 2 registros duplicados descartados.
+          </div>
+        </div>
+
+        <div class="vf-alert vf-alert--demo mt-3">
+          <i class="bi bi-shield-lock"></i>
+          <div class="small">
+            <strong>Seguridad de Datos:</strong> Ningún archivo se envía a servidores. La validación criptográfica y almacenamiento seguro del padrón se implementarán en la capa Django / MySQL.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de Registros del Padrón (Enmascarados) -->
+  <div class="col-lg-7">
+    <div class="panel-card mb-4">
+      <div class="panel-card__head">
+        <h2><i class="bi bi-person-check me-2 text-primary"></i> Muestra de Votantes en Padrón (Enmascarados)</h2>
+        <span class="badge bg-secondary">Datos Demo</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" id="votersTable">
+          <thead>
+            <tr>
+              <th>Identificación (Ofuscada)</th>
+              <th>Correo (Ofuscado)</th>
+              <th>Estado</th>
+              <th>Integridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Render dinámico desde admin.js con datos enmascarados -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

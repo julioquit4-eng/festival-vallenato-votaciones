@@ -1,139 +1,16 @@
 {% extends "public/base_public.html" %}
-{% load static %}
 
-{% block title %}Confirmación del voto{% endblock %}
+{% block title %}Confirmación de voto{% endblock %}
 {% block page_id %}confirmar_voto{% endblock %}
 {% block nav_section %}votaciones{% endblock %}
 
 {% block content %}
-<header class="page-hero">
-  <div class="container">
-    <nav aria-label="Miga de pan">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{% url 'public:inicio' %}">Inicio</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'public:votaciones' %}">Votaciones</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Confirmación</li>
-      </ol>
-    </nav>
-    <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
-      <span class="vf-eyebrow vf-eyebrow--light">Paso 3 de 4</span>
-      <span class="vf-badge vf-badge--yellow"><i class="bi bi-shield-check" aria-hidden="true"></i>Verificación Oficial</span>
-    </div>
-    <h1>Confirma tu elección</h1>
-    <p>Por favor revisa cuidadosamente la selección efectuada antes de asentar tu voto. Recuerda que una vez confirmado, el voto es inmodificable y definitivo.</p>
-  </div>
-</header>
-
 <div class="container my-5">
-  <ol class="vf-stepper mb-5" aria-label="Progreso de votación">
-    <li class="is-done">
-      <span class="dot"><i class="bi bi-check"></i></span>
-      <span>Opción</span>
-    </li>
-    <li class="is-done">
-      <span class="dot"><i class="bi bi-check"></i></span>
-      <span>Validación</span>
-    </li>
-    <li class="is-current" aria-current="step">
-      <span class="dot">3</span>
-      <span>Confirmar</span>
-    </li>
-    <li>
-      <span class="dot">4</span>
-      <span>Comprobante</span>
-    </li>
-  </ol>
-
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
-      <div class="summary-card vf-card vf-card--pad mb-4">
-        <h2 class="h4 mb-4 pb-2 border-bottom d-flex align-items-center gap-2">
-          <i class="bi bi-card-checklist text-gold"></i> Resumen de la votación
-        </h2>
-
-        <dl class="row mb-4">
-          <dt class="col-sm-4 text-muted">Votación:</dt>
-          <dd class="col-sm-8" id="confVoteName">Favorito del público: Acordeonero Profesional</dd>
-
-          <dt class="col-sm-4 text-muted">Categoría:</dt>
-          <dd class="col-sm-8" id="confCategoryName">Acordeonero Profesional</dd>
-
-          <dt class="col-sm-4 text-muted">Votante habilitado:</dt>
-          <dd class="col-sm-8">
-            <span id="confVoterDoc" class="vf-mono">C.C. ••••••••456</span> 
-            <small class="text-muted d-block" id="confVoterEmail">us•••••@ejemplo.com</small>
-          </dd>
-        </dl>
-
-        <div class="mb-4">
-          <label class="form-label text-muted text-uppercase fw-bold" style="font-size:0.75rem;">Opción o candidato seleccionado:</label>
-          <div class="summary-choice" id="confChoiceBox">
-            <div id="confAvatarContainer">
-              <!-- Avatar generado dinámicamente -->
-              <div class="vf-avatar" style="--vf-av-a:#183B56;--vf-av-b:#10243A;">ML</div>
-            </div>
-            <div>
-              <h3 class="h5 mb-1" id="confCandidateName">Mateo Larrañaga</h3>
-              <p class="text-muted small mb-0" id="confCandidateDesc">Acordeonero con repertorio tradicional de son y paseo.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Advertencia de voto definitivo (RF-04 / RF-05) -->
-        <div class="vf-alert vf-alert--danger mb-4" role="alert">
-          <i class="bi bi-shield-exclamation fs-4"></i>
-          <div>
-            <strong>Advertencia importante sobre tu voto</strong>
-            <p class="small mb-0">
-              De acuerdo con el reglamento electoral del Festival de la Leyenda Vallenata 2027, 
-              <strong>una vez emitido y registrado el voto, este adquiere carácter definitivo, confidencial e inmodificable</strong>. 
-              No podrás cambiar tu elección ni votar nuevamente en esta misma categoría.
-            </p>
-          </div>
-        </div>
-
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 pt-3 border-top">
-          <a href="{% url 'public:detalle_votacion' %}" class="btn btn-vf-outline" id="btnBackToSelection">
-            <i class="bi bi-arrow-left"></i> Modificar selección
-          </a>
-          <button type="button" class="btn btn-vf btn-lg" id="btnTriggerModalConfirm">
-            <i class="bi bi-check2-circle"></i> Confirmar y emitir voto
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Modal de Segunda Confirmación Requerido por especificación -->
-<div class="modal fade" id="modalFinalConfirm" tabindex="-1" aria-labelledby="modalFinalConfirmTitle" aria-hidden="true" data-bs-backdrop="static">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header border-0 pb-0">
-        <h2 class="modal-title h5 text-danger d-flex align-items-center gap-2" id="modalFinalConfirmTitle">
-          <i class="bi bi-exclamation-triangle-fill"></i> ¿Confirmas tu elección final?
-        </h2>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body py-4">
-        <p class="mb-3">
-          Estás a punto de asentar definitivamente tu voto por:
-        </p>
-        <div class="p-3 bg-light rounded-3 text-center border mb-3">
-          <h3 class="h5 text-dark mb-0" id="modalConfirmCandidate">Mateo Larrañaga</h3>
-          <span class="small text-muted" id="modalConfirmCategory">Acordeonero Profesional</span>
-        </div>
-        <p class="small text-muted mb-0">
-          Esta acción cerrará tu participación en este proceso electoral. No podrás deshacer esta operación.
-        </p>
-      </div>
-      <div class="modal-footer border-0 pt-0">
-        <button type="button" class="btn btn-vf-outline" data-bs-dismiss="modal">Revisar de nuevo</button>
-        <button type="button" class="btn btn-vf" id="btnDefinitiveConfirmVote">
-          Sí, emitir voto definitivo
-        </button>
-      </div>
-    </div>
+  <div class="vf-empty">
+    <i class="bi bi-info-circle" aria-hidden="true"></i>
+    <h1 class="h3">El registro de votos aún no está disponible</h1>
+    <p class="text-muted">No se ha recibido ni registrado ningún voto. La participación se habilitará cuando esté listo el padrón de votantes y el registro seguro de sufragios.</p>
+    <a href="{% url 'public:votaciones' %}" class="btn btn-vf-outline mt-2">Volver a votaciones</a>
   </div>
 </div>
 {% endblock %}

@@ -31,14 +31,12 @@
       </p>
 
       <div class="d-flex flex-wrap gap-3 align-items-center mt-4 vf-reveal vf-reveal-4">
-        <!-- Disparador del Modal de Acceso del Votante -->
-        <button type="button" class="btn btn-vf btn-lg" data-bs-toggle="modal" data-bs-target="#voterAccessModal" id="heroCtaVotar">
-          <i class="bi bi-box-arrow-in-right me-1"></i> Ingresar a votar
-        </button>
-        <!-- Disparador del Modal de Inicio de Sesión -->
-        <button type="button" class="btn btn-vf-outline btn-lg" data-bs-toggle="modal" data-bs-target="#loginModal" id="heroCtaLogin">
+        <a class="btn btn-vf btn-lg" href="{% url 'public:votaciones' %}" id="heroCtaVotar">
+          <i class="bi bi-list-check me-1"></i> Consultar votaciones
+        </a>
+        <a class="btn btn-vf-outline btn-lg" href="{% url 'public:login' %}" id="heroCtaLogin">
           <i class="bi bi-person-circle me-1"></i> Iniciar sesión
-        </button>
+        </a>
         <a class="btn-link-vf ms-lg-2" href="{% url 'public:guia' %}">¿Cómo funciona?</a>
       </div>
 
@@ -82,9 +80,9 @@
               Los grandes juglares compiten por la corona del Festival en la mítica plaza Alfonso López.
             </p>
             <div class="d-flex align-items-center gap-2">
-              <button type="button" class="btn btn-vf-gold btn-sm" data-bs-toggle="modal" data-bs-target="#voterAccessModal">
-                Votar en esta categoría <i class="bi bi-arrow-right ms-1"></i>
-              </button>
+              <a class="btn btn-vf-gold btn-sm" href="{% url 'public:votaciones' %}">
+                Consultar votaciones <i class="bi bi-arrow-right ms-1"></i>
+              </a>
             </div>
           </div>
         </div>
@@ -180,14 +178,18 @@
       </div>
     </div>
 
-    {% comment %}
-      PUNTO DE INTEGRACIÓN: en Django, reemplazar el render JS por un bucle:
-      {% for votacion in votaciones_destacadas %} {% include "partials/vote_card.html" %} {% endfor %}
-    {% endcomment %}
     <div class="row g-4" id="featuredVotes" aria-live="polite">
-      <div class="col-12"><div class="vf-empty"><i class="bi bi-hourglass" aria-hidden="true"></i>Cargando votaciones…</div></div>
+      {% for votacion in votaciones_destacadas %}
+        <div class="col-md-6 col-lg-4">{% include "partials/public_vote_card.html" %}</div>
+      {% empty %}
+        <div class="col-12">
+          <div class="vf-empty">
+            <i class="bi bi-hourglass" aria-hidden="true"></i>
+            <p>No hay votaciones habilitadas en este momento.</p>
+          </div>
+        </div>
+      {% endfor %}
     </div>
-    <noscript><p class="vf-alert vf-alert--warning mt-3">Activa JavaScript para disfrutar de todas las funciones del sistema.</p></noscript>
 
     <div class="text-center mt-5">
       <a class="btn btn-vf-outline btn-lg" href="{% url 'public:votaciones' %}">Ver todas las votaciones <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
@@ -201,9 +203,9 @@
     <div class="row g-5 align-items-center">
       <div class="col-lg-4">
         <span class="vf-eyebrow vf-eyebrow--light">Proceso de votación</span>
-        <h2 class="section__title" id="pasosTitle">Claro, seguro y en tres pasos</h2>
-        <p class="section__lead">Solo las personas registradas en el padrón autorizado podrán votar. Tu información se trata conforme a la política de datos personales.</p>
-        <a class="btn btn-vf-gold mt-2" href="{% url 'public:guia' %}">Leer la guía completa</a>
+        <h2 class="section__title" id="pasosTitle">Consulta pública y participación pendiente</h2>
+        <p class="section__lead">Por ahora puedes consultar las votaciones y sus opciones. La validación del padrón y el registro de votos aún no están habilitados.</p>
+        <a class="btn btn-vf-gold mt-2" href="{% url 'public:guia' %}">Ver información del proceso</a>
       </div>
       <div class="col-lg-8">
         <div class="row g-3">
@@ -211,24 +213,24 @@
             <article class="step-card">
               <span class="step-card__num" aria-hidden="true">01</span>
               <span class="vf-icon-circle"><i class="bi bi-person-vcard" aria-hidden="true"></i></span>
-              <h3>Valida tu acceso</h3>
-              <p>Ingresa tu cédula y correo. La organización confirma si estás habilitado en el padrón.</p>
+              <h3>Consulta las votaciones</h3>
+              <p>Revisa los procesos y sus fechas directamente desde la información publicada.</p>
             </article>
           </div>
           <div class="col-md-4">
             <article class="step-card">
               <span class="step-card__num" aria-hidden="true">02</span>
               <span class="vf-icon-circle"><i class="bi bi-hand-index-thumb" aria-hidden="true"></i></span>
-              <h3>Elige tu favorito</h3>
-              <p>Revisa las opciones de la votación abierta y selecciona una sola preferencia.</p>
+              <h3>Conoce las opciones</h3>
+              <p>Consulta los detalles de las opciones registradas en cada votación.</p>
             </article>
           </div>
           <div class="col-md-4">
             <article class="step-card">
               <span class="step-card__num" aria-hidden="true">03</span>
               <span class="vf-icon-circle"><i class="bi bi-patch-check" aria-hidden="true"></i></span>
-              <h3>Confirma tu voto</h3>
-              <p>Verifica el resumen y confirma. Una vez registrado, el voto es definitivo.</p>
+              <h3>Participación pendiente</h3>
+              <p>La validación de votantes y la emisión del voto se habilitarán en una etapa posterior.</p>
             </article>
           </div>
         </div>

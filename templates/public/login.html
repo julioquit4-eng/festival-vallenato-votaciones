@@ -1,152 +1,86 @@
 {% extends "public/base_public.html" %}
 {% load static %}
 
-{% block title %}Iniciar Sesión · Portal del Festival{% endblock %}
+{% block title %}Acceso administrativo · Festival Vallenato{% endblock %}
 {% block page_id %}login{% endblock %}
 {% block nav_section %}login{% endblock %}
 
 {% block content %}
 <div class="auth-shell">
-  <!-- Lateral decorativo con fotografía de acordeón y notas musicales -->
   <aside class="auth-aside" style="background-image: linear-gradient(180deg, rgba(14, 41, 30, .85) 0%, rgba(14, 41, 30, .98) 100%), url('{% static 'img/hero-acordeon.jpg' %}'); background-size: cover; background-position: center;">
     <div class="position-relative z-1">
-      <span class="vf-eyebrow vf-eyebrow--light">Festival de la Leyenda Vallenata 2027</span>
-      <h2 class="mt-2 text-white">Acceso al Sistema Electoral</h2>
-      <p class="text-white-50">Plataforma integral de participación ciudadana y gestión técnica del certamen vallenato más importante de Colombia.</p>
-      
-      <div class="p-3 rounded-3 mt-4" style="background: rgba(255,255,255,0.08); backdrop-filter: blur(8px); border: 1px solid rgba(197, 168, 128, 0.3);">
-        <div class="d-flex align-items-center gap-3">
-          <i class="bi bi-shield-lock-fill fs-2 text-gold"></i>
-          <div class="small text-white-50">
-            <strong class="text-white d-block">Seguridad y Roles</strong>
-            Selecciona la pestaña según tu perfil: votante habilitado en el padrón o funcionario del comité organizador.
-          </div>
-        </div>
+      <span class="vf-eyebrow vf-eyebrow--light">Festival de la Leyenda Vallenata</span>
+      <h2 class="mt-2 text-white">Acceso al sistema</h2>
+      <p class="text-white-50">Ingresa con una cuenta autorizada del comité organizador.</p>
+      <div class="p-3 rounded-3 mt-4 text-white-50 small" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(197, 168, 128, 0.3);">
+        <i class="bi bi-shield-lock-fill fs-4 text-gold me-2"></i>
+        Solo las cuentas con permisos administrativos pueden ingresar al panel.
       </div>
     </div>
   </aside>
 
-  <!-- Tarjeta con pestañas: Votante vs Administrador -->
   <section class="auth-main" aria-labelledby="loginMainHeading">
-    <div class="auth-card vf-reveal card-colombia">
+    <div class="auth-card card-colombia">
       <div class="text-center mb-4">
         <span class="vf-brand__mark mx-auto mb-2" style="width: 3.2rem; height: 3.2rem; font-size: 1.4rem;">
           <i class="bi bi-person-badge"></i>
         </span>
-        <h1 class="h3 fw-bold mb-1" id="loginMainHeading" style="font-family: var(--vf-font-display);">Iniciar Sesión</h1>
-        <p class="text-muted small">Ingresa tus credenciales autorizadas</p>
+        <h1 class="h3 fw-bold mb-1" id="loginMainHeading" style="font-family: var(--vf-font-display);">Iniciar sesión</h1>
+        <p class="text-muted small">Usa tu usuario y contraseña institucionales.</p>
       </div>
 
-      <!-- Selector de Rol con Tabs -->
-      <ul class="nav nav-pills nav-fill mb-4 p-1 rounded-pill border" id="loginRoleTabs" role="tablist" style="background: var(--vf-ivory-2);">
-        <li class="nav-item" role="presentation">
-          <button class="nav-link active rounded-pill fw-bold py-2" id="tab-voter" data-bs-toggle="pill" data-bs-target="#pane-voter" type="button" role="tab" aria-controls="pane-voter" aria-selected="true">
-            <i class="bi bi-person-check me-1"></i> Votante
-          </button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link rounded-pill fw-bold py-2" id="tab-admin" data-bs-toggle="pill" data-bs-target="#pane-admin" type="button" role="tab" aria-controls="pane-admin" aria-selected="false">
-            <i class="bi bi-shield-shaded me-1"></i> Administrador
-          </button>
-        </li>
-      </ul>
-
-      <div class="tab-content" id="loginRoleTabsContent">
-        <!-- ================= PESTAÑA VOTANTE ================= -->
-        <div class="tab-pane fade show active" id="pane-voter" role="tabpanel" aria-labelledby="tab-voter">
-          <div class="vf-alert vf-alert--info mb-3 py-2 px-3">
-            <i class="bi bi-info-circle fs-6 text-primary"></i>
-            <div style="font-size:0.78rem;">
-              <strong>Acceso de Votantes:</strong> No requiere contraseña. Se valida contra la cédula y correo registrados en el padrón oficial.
-            </div>
+      <form method="post" action="{% url 'public:login' %}">
+        {% csrf_token %}
+        {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
+        {% if form.non_field_errors %}
+          <div class="vf-alert vf-alert--warning mb-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <div>{{ form.non_field_errors }}</div>
           </div>
+        {% endif %}
 
-          <form id="voterDirectLoginForm" novalidate>
-            {% csrf_token %}
-            <div class="mb-3">
-              <label for="loginCedula" class="form-label small fw-bold">Número de cédula <span class="req">*</span></label>
-              <div class="vf-input-icon">
-                <i class="bi bi-person-vcard"></i>
-                <input type="text" class="form-control" id="loginCedula" name="cedula" placeholder="Ej. 1.065.123.456" required pattern="[0-9]{6,12}" data-msg-required="Ingresa tu cédula." data-msg-pattern="Ingresa entre 6 y 12 dígitos.">
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <label for="loginCorreo" class="form-label small fw-bold">Correo electrónico registrado <span class="req">*</span></label>
-              <div class="vf-input-icon">
-                <i class="bi bi-envelope"></i>
-                <input type="email" class="form-control" id="loginCorreo" name="correo" placeholder="nombre@correo.com" required data-msg-required="Ingresa tu correo registrado." data-msg-type="Ingresa un correo válido.">
-              </div>
-            </div>
-
-            <div class="form-check mb-4">
-              <input class="form-check-input" type="checkbox" id="loginHabeasCheck" name="habeas_data" required data-msg-required="Debes aceptar el tratamiento de datos.">
-              <label class="form-check-label small text-muted" for="loginHabeasCheck">
-                Acepto la <a href="{% url 'public:privacidad' %}" target="_blank">política de tratamiento de datos personales</a>. <span class="req">*</span>
-              </label>
-            </div>
-
-            <div class="d-grid gap-2">
-              <button type="submit" class="btn btn-vf btn-lg" id="btnSubmitVoterLogin">
-                Ingresar a las votaciones <i class="bi bi-arrow-right ms-1"></i>
-              </button>
-            </div>
-          </form>
+        <div class="mb-3">
+          <label for="{{ form.username.id_for_label }}" class="form-label small fw-bold">Usuario <span class="req">*</span></label>
+          <div class="vf-input-icon">
+            <i class="bi bi-person-fill-lock"></i>
+            <input
+              type="text"
+              name="{{ form.username.html_name }}"
+              id="{{ form.username.id_for_label }}"
+              class="form-control{% if form.username.errors %} is-invalid{% endif %}"
+              value="{{ form.username.value|default_if_none:'' }}"
+              autocomplete="username"
+              required
+              autofocus>
+          </div>
+          {% for error in form.username.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
         </div>
 
-        <!-- ================= PESTAÑA ADMINISTRADOR ================= -->
-        <div class="tab-pane fade" id="pane-admin" role="tabpanel" aria-labelledby="tab-admin">
-          <div class="vf-alert vf-alert--warning mb-3 py-2 px-3">
-            <i class="bi bi-shield-exclamation fs-6"></i>
-            <div style="font-size:0.78rem;">
-              <strong>Acceso Restringido:</strong> Exclusivo para miembros del comité organizador, auditores y jurados técnicos del certamen.
-            </div>
+        <div class="mb-4">
+          <label for="{{ form.password.id_for_label }}" class="form-label small fw-bold">Contraseña <span class="req">*</span></label>
+          <div class="vf-input-icon">
+            <i class="bi bi-key-fill"></i>
+            <input
+              type="password"
+              name="{{ form.password.html_name }}"
+              id="{{ form.password.id_for_label }}"
+              class="form-control{% if form.password.errors %} is-invalid{% endif %}"
+              autocomplete="current-password"
+              required>
           </div>
-
-          <form id="adminLoginForm" novalidate>
-            {% csrf_token %}
-            <div class="mb-3">
-              <label for="adminUsername" class="form-label small fw-bold">Usuario administrativo o correo <span class="req">*</span></label>
-              <div class="vf-input-icon">
-                <i class="bi bi-person-fill-lock"></i>
-                <input type="text" class="form-control" id="adminUsername" name="username" placeholder="admin@festivalvallenato.com" required data-msg-required="Ingresa tu usuario institucional.">
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <label for="adminPassword" class="form-label small fw-bold">Contraseña institucional <span class="req">*</span></label>
-              <div class="input-group">
-                <div class="vf-input-icon flex-grow-1">
-                  <i class="bi bi-key-fill"></i>
-                  <input type="password" class="form-control" id="adminPassword" name="password" placeholder="••••••••••••" required data-msg-required="Ingresa tu contraseña de acceso.">
-                </div>
-                <button class="btn btn-outline-secondary" type="button" data-toggle-password="adminPassword" aria-label="Mostrar u ocultar contraseña">
-                  <i class="bi bi-eye"></i>
-                </button>
-              </div>
-            </div>
-
-            <div class="d-flex justify-content-between align-items-center mb-4">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="rememberAdmin">
-                <label class="form-check-label small text-muted" for="rememberAdmin">Recordar sesión</label>
-              </div>
-              <a href="#" class="small text-muted text-decoration-none" data-not-implemented="Para recuperar tu clave comunícate con la coordinación técnica del Festival.">¿Olvidaste tu contraseña?</a>
-            </div>
-
-            <div class="d-grid gap-2">
-              <button type="submit" class="btn btn-vf btn-lg" id="btnSubmitAdminLogin">
-                <i class="bi bi-box-arrow-in-right me-1"></i> Entrar al Panel de Control
-              </button>
-            </div>
-
-            <div class="mt-3 p-2 rounded bg-light border text-center">
-              <small class="text-muted" style="font-size:0.72rem;">
-                <i class="bi bi-info-circle me-1"></i><strong>Datos demo sugeridos:</strong> <code>admin</code> / cualquier contraseña para probar la maqueta.
-              </small>
-            </div>
-          </form>
+          {% for error in form.password.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
         </div>
+
+        <div class="d-grid gap-2">
+          <button type="submit" class="btn btn-vf btn-lg">
+            <i class="bi bi-box-arrow-in-right me-1"></i> Entrar al panel
+          </button>
+        </div>
+      </form>
+
+      <div class="vf-alert vf-alert--info mt-4 mb-0" role="status">
+        <i class="bi bi-info-circle"></i>
+        <div class="small">La validación de votantes se habilitará cuando se implemente el padrón oficial.</div>
       </div>
 
       <div class="text-center mt-4 pt-3 border-top">

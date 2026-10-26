@@ -1,10 +1,87 @@
-{% extends "panel/ediciones.html" %}
-{# Reutiliza la misma interfaz de ediciones/categorías con foco en categorías #}
+{% extends "panel/base_panel.html" %}
+
 {% block title %}Gestión de Categorías{% endblock %}
 {% block header_title %}Categorías de Competición{% endblock %}
 {% block page_id %}categorias{% endblock %}
 {% block nav_section %}categorias{% endblock %}
+
 {% block breadcrumbs %}
-<li class="breadcrumb-item"><a href="{% url 'panel:ediciones' %}">Ediciones</a></li>
 <li class="breadcrumb-item active" aria-current="page">Categorías</li>
+{% endblock %}
+
+{% block content %}
+<div class="panel-card mb-4">
+  <div class="panel-card__head">
+    <h2><i class="bi bi-tags me-2"></i> Categorías registradas</h2>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0" id="categoriesTable">
+      <thead>
+        <tr>
+          <th>Categoría</th>
+          <th>Edición</th>
+          <th>Descripción</th>
+          <th>Estado</th>
+          <th class="text-end">Acciones</th>
+        </tr>
+      </thead>
+      <tbody data-source="database">
+        {% for categoria in categorias %}
+          <tr>
+            <td><strong>{{ categoria.nombre }}</strong></td>
+            <td>{{ categoria.edicion.nombre }} ({{ categoria.edicion.anio }})</td>
+            <td>{{ categoria.descripcion|default:"—" }}</td>
+            <td>
+              {% if categoria.activa %}
+                <span class="vf-status vf-status--activa">Activa</span>
+              {% else %}
+                <span class="vf-status vf-status--inactiva">Inactiva</span>
+              {% endif %}
+            </td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-vf-outline" href="{% url 'panel:editar_categoria' categoria.pk %}" aria-label="Editar {{ categoria.nombre }}"><i class="bi bi-pencil"></i></a>
+              <form class="d-inline" method="post" action="{% url 'panel:eliminar_categoria' categoria.pk %}" onsubmit="return confirm('¿Eliminar esta categoría? Solo se puede borrar si no tiene votaciones asociadas.');">
+                {% csrf_token %}
+                <button class="btn btn-sm btn-outline-danger" type="submit" aria-label="Eliminar {{ categoria.nombre }}"><i class="bi bi-trash"></i></button>
+              </form>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5" class="text-center py-4 text-muted">No hay categorías registradas.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="panel-card">
+  <div class="panel-card__head">
+    <h2><i class="bi bi-plus-circle me-2"></i> Nueva categoría</h2>
+  </div>
+  <div class="panel-card__body">
+    {% if not hay_ediciones %}
+      <p class="text-muted mb-0">Primero registra una <a href="{% url 'panel:ediciones' %}">edición del festival</a> para poder asignarle categorías.</p>
+    {% else %}
+      <form method="post" action="{% url 'panel:categorias' %}">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="row g-3">
+          {% for field in form %}
+            <div class="{% if field.name == 'descripcion' %}col-12{% else %}col-md-6{% endif %}">
+              {% if field.field.widget.input_type == "checkbox" %}
+                <div class="form-check form-switch mt-4">{{ field }}{{ field.label_tag }}</div>
+              {% else %}
+                {{ field.label_tag }}{{ field }}
+              {% endif %}
+              {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+        <div class="d-flex justify-content-end mt-3">
+          <button type="submit" class="btn btn-vf">Guardar categoría</button>
+        </div>
+      </form>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}

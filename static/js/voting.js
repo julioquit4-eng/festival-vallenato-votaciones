@@ -229,7 +229,67 @@
     var currentFilter = 'todas';
     var currentSearch = '';
 
-    if (!VF.data) return;
+    if (!container) return;
+    if (!VF.data || container.dataset.source === 'database') {
+      var cards = Array.prototype.slice.call(container.querySelectorAll('[data-vote-card]'));
+      var counts = {
+        todas: cards.length,
+        abierta: cards.filter(function (card) { return card.dataset.status === 'abierta'; }).length,
+        proxima: cards.filter(function (card) { return card.dataset.status === 'proxima'; }).length,
+        cerrada: cards.filter(function (card) { return card.dataset.status === 'cerrada'; }).length
+      };
+
+      Object.keys(counts).forEach(function (status) {
+        var count = document.getElementById({
+          todas: 'countTodas',
+          abierta: 'countAbiertas',
+          proxima: 'countProximas',
+          cerrada: 'countCerradas'
+        }[status]);
+        if (count) count.textContent = counts[status];
+      });
+
+      function filterRenderedCards() {
+        var visibleCount = 0;
+        cards.forEach(function (card) {
+          var matchesStatus = currentFilter === 'todas' || card.dataset.status === currentFilter;
+          var matchesText = card.textContent.toLowerCase().indexOf(currentSearch.trim().toLowerCase()) !== -1;
+          var visible = matchesStatus && matchesText;
+          card.parentElement.classList.toggle('d-none', !visible);
+          if (visible) visibleCount += 1;
+        });
+        if (emptyBox) emptyBox.classList.toggle('d-none', visibleCount > 0);
+      }
+
+      chipButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          chipButtons.forEach(function (chip) { chip.setAttribute('aria-pressed', 'false'); });
+          button.setAttribute('aria-pressed', 'true');
+          currentFilter = button.dataset.statusFilter;
+          filterRenderedCards();
+        });
+      });
+      if (searchInput) {
+        searchInput.addEventListener('input', function () {
+          currentSearch = searchInput.value;
+          filterRenderedCards();
+        });
+      }
+      var resetRenderedFilters = document.getElementById('btnResetFilters');
+      if (resetRenderedFilters) {
+        resetRenderedFilters.addEventListener('click', function () {
+          currentFilter = 'todas';
+          currentSearch = '';
+          if (searchInput) searchInput.value = '';
+          chipButtons.forEach(function (button) {
+            button.setAttribute('aria-pressed', button.dataset.statusFilter === 'todas');
+          });
+          filterRenderedCards();
+        });
+      }
+      filterRenderedCards();
+      return;
+    }
 
     // Actualizar contadores en los chips
     var todas = VF.data.votaciones.length;
@@ -349,6 +409,8 @@
      PANTALLA 3: DETALLE DE VOTACIÓN Y SELECCIÓN EXCLUSIVA DE CANDIDATOS
      ------------------------------------------------------------------------- */
   VF.pages.detalle_votacion = function () {
+    if (document.getElementById('serverVoteDetail')) return;
+
     var voteId = getActiveVoteId();
     sessionVoterState.selectedVoteId = voteId;
 
@@ -463,6 +525,8 @@
      PANTALLA 4: VALIDACIÓN DEL VOTANTE (ACCESO)
      ------------------------------------------------------------------------- */
   VF.pages.acceso_votante = function () {
+    if (!VF.data || !VF.q) return;
+
     var voteId = getActiveVoteId();
     var optId = VF.param('opt') || sessionVoterState.selectedOptionId || 'op-01';
     sessionVoterState.selectedVoteId = voteId;
@@ -505,6 +569,8 @@
      PANTALLA 5: CONFIRMACIÓN DEL VOTO Y SEGUNDA CONFIRMACIÓN MODAL
      ------------------------------------------------------------------------- */
   VF.pages.confirmar_voto = function () {
+    if (!VF.data || !VF.q) return;
+
     var voteId = getActiveVoteId();
     var optId = VF.param('opt') || sessionVoterState.selectedOptionId || 'op-01';
 
@@ -562,6 +628,8 @@
      PANTALLA 6: COMPROBANTE DE VOTO
      ------------------------------------------------------------------------- */
   VF.pages.comprobante = function () {
+    if (!VF.data || !VF.q) return;
+
     var voteId = getActiveVoteId();
     var vote = VF.q.votacion(voteId) || VF.data.votaciones[0];
     var cat = VF.q.categoria(vote.categoriaId);

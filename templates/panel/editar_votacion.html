@@ -1,0 +1,35 @@
+{% extends "panel/base_panel.html" %}
+
+{% block title %}Editar votación{% endblock %}
+{% block header_title %}Editar votación{% endblock %}
+{% block page_id %}votaciones_admin{% endblock %}
+{% block nav_section %}votaciones{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'panel:votaciones' %}">Procesos de votación</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ votacion.titulo }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="panel-card">
+  <div class="panel-card__head"><h2>{{ votacion.titulo }}</h2></div>
+  <div class="panel-card__body">
+    <form method="post">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      <div class="row g-3">
+        {% for field in form %}
+          <div class="{% if field.name == 'descripcion' %}col-12{% else %}col-md-6{% endif %}">
+            {{ field.label_tag }}{{ field }}
+            {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+      <div class="d-flex justify-content-end gap-2 mt-3">
+        <a class="btn btn-vf-outline" href="{% url 'panel:votaciones' %}">Cancelar</a>
+        <button type="submit" class="btn btn-vf">Guardar cambios</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

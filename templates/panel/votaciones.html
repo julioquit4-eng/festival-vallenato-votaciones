@@ -1,5 +1,4 @@
 {% extends "panel/base_panel.html" %}
-{% load static %}
 
 {% block title %}Gestión de Votaciones{% endblock %}
 {% block header_title %}Procesos de Votación{% endblock %}
@@ -13,82 +12,74 @@
 {% block content %}
 <div class="panel-card mb-4">
   <div class="panel-card__head">
-    <h2><i class="bi bi-ui-checks-grid me-2 text-primary"></i> Todos los Procesos de Votación</h2>
-    <button type="button" class="btn btn-sm btn-vf" id="btnOpenNewVoteProcessModal">
-      <i class="bi bi-plus-lg"></i> Crear Nuevo Proceso
-    </button>
+    <h2><i class="bi bi-ui-checks-grid me-2 text-primary"></i> Procesos de votación</h2>
   </div>
   <div class="table-responsive">
-    <table class="table table-hover align-middle mb-0" id="adminVotesTable">
+    <table class="table table-hover align-middle mb-0" id="modelVotesTable">
       <thead>
         <tr>
           <th>Votación</th>
-          <th>Categoría</th>
+          <th>Categoría / Edición</th>
           <th>Apertura</th>
           <th>Cierre</th>
           <th>Estado</th>
-          <th class="text-end">Operaciones</th>
+          <th class="text-end">Acciones</th>
         </tr>
       </thead>
       <tbody>
-        <!-- Renderizado dinámico -->
+        {% for votacion in votaciones %}
+          <tr>
+            <td><strong>{{ votacion.titulo }}</strong><br><small class="text-muted">{{ votacion.descripcion|default:"Sin descripción" }}</small></td>
+            <td>{{ votacion.categoria.nombre }}<br><small class="text-muted">{{ votacion.categoria.edicion.nombre }} ({{ votacion.categoria.edicion.anio }})</small></td>
+            <td>{{ votacion.fecha_apertura|date:"d/m/Y H:i" }}</td>
+            <td>{{ votacion.fecha_cierre|date:"d/m/Y H:i" }}</td>
+            <td><span class="badge text-bg-secondary">{{ votacion.get_estado_display }}</span></td>
+            <td class="text-end text-nowrap">
+              {% if not votacion.esta_abierta %}
+                <a class="btn btn-sm btn-vf-outline" href="{% url 'panel:editar_votacion' votacion.pk %}" aria-label="Editar {{ votacion.titulo }}"><i class="bi bi-pencil"></i></a>
+                <form class="d-inline" method="post" action="{% url 'panel:eliminar_votacion' votacion.pk %}" onsubmit="return confirm('¿Eliminar esta votación y sus opciones?');">
+                  {% csrf_token %}
+                  <button class="btn btn-sm btn-outline-danger" type="submit" aria-label="Eliminar {{ votacion.titulo }}"><i class="bi bi-trash"></i></button>
+                </form>
+              {% else %}
+                <span class="small text-muted">Bloqueada mientras está abierta</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="text-center py-4 text-muted">Todavía no hay votaciones registradas.</td></tr>
+        {% endfor %}
       </tbody>
     </table>
   </div>
 </div>
 
-<!-- Modal Crear/Editar Proceso de Votación -->
-<div class="modal fade" id="voteProcessModal" tabindex="-1" aria-labelledby="voteProcessModalTitle" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <form id="voteProcessForm" novalidate>
-        <div class="modal-header">
-          <h2 class="modal-title h5" id="voteProcessModalTitle">Configurar Proceso de Votación</h2>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
-          <div class="row g-3">
-            <div class="col-md-6">
-              <label for="vpTitleInput" class="form-label">Título de la votación <span class="req">*</span></label>
-              <input type="text" class="form-control" id="vpTitleInput" required placeholder="Ej: Favorito del público: Acordeonero">
-            </div>
-            <div class="col-md-6">
-              <label for="vpCategorySelect" class="form-label">Categoría asignada <span class="req">*</span></label>
-              <select class="form-select" id="vpCategorySelect" required>
-                <!-- Opciones dinámicas -->
-              </select>
-            </div>
-            <div class="col-12">
-              <label for="vpDescInput" class="form-label">Descripción orientativa para el votante</label>
-              <textarea class="form-control" id="vpDescInput" rows="2"></textarea>
-            </div>
-            <div class="col-md-6">
-              <label for="vpStartDateInput" class="form-label">Fecha y hora de apertura <span class="req">*</span></label>
-              <input type="datetime-local" class="form-control" id="vpStartDateInput" required>
-            </div>
-            <div class="col-md-6">
-              <label for="vpEndDateInput" class="form-label">Fecha y hora de cierre <span class="req">*</span></label>
-              <input type="datetime-local" class="form-control" id="vpEndDateInput" required>
-              <div class="invalid-feedback" id="dateOrderFeedback">La fecha de cierre debe ser posterior a la de apertura.</div>
-            </div>
-            <div class="col-md-6">
-              <label for="vpStatusSelect" class="form-label">Estado inicial <span class="req">*</span></label>
-              <select class="form-select" id="vpStatusSelect">
-                <option value="borrador">Borrador</option>
-                <option value="proxima">Próximamente</option>
-                <option value="abierta">Abierta</option>
-                <option value="pausada">Pausada</option>
-                <option value="cerrada">Cerrada</option>
-              </select>
-            </div>
+<div class="panel-card">
+  <div class="panel-card__head">
+    <h2><i class="bi bi-plus-circle me-2"></i> Crear votación</h2>
+  </div>
+  <div class="panel-card__body">
+    <form method="post" action="{% url 'panel:crear_votacion' %}">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      <div class="row g-3">
+        {% for field in form %}
+          <div class="{% if field.name == 'descripcion' %}col-12{% else %}col-md-6{% endif %}">
+            {% if field.field.widget.input_type == "checkbox" %}
+              <div class="form-check form-switch mt-4">
+                {{ field }}{{ field.label_tag }}
+              </div>
+            {% else %}
+              {{ field.label_tag }}{{ field }}
+            {% endif %}
+            {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
           </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-vf-outline" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-vf">Guardar proceso (Demo)</button>
-        </div>
-      </form>
-    </div>
+        {% endfor %}
+      </div>
+      <div class="d-flex justify-content-end mt-3">
+        <button type="submit" class="btn btn-vf">Guardar votación</button>
+      </div>
+    </form>
   </div>
 </div>
 {% endblock %}

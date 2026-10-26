@@ -1,5 +1,4 @@
 {% extends "panel/base_panel.html" %}
-{% load static %}
 
 {% block title %}Censo y Padrón Electoral{% endblock %}
 {% block header_title %}Padrón Oficial de Votantes{% endblock %}
@@ -11,82 +10,178 @@
 {% endblock %}
 
 {% block content %}
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags|default:'info' }}{% endif %} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+
 <div class="row g-4">
-  <!-- Zona de Carga Masiva (CSV) -->
   <div class="col-lg-5">
     <div class="panel-card mb-4">
       <div class="panel-card__head">
-        <h2><i class="bi bi-file-earmark-arrow-up me-2 text-primary"></i> Carga Masiva de Votantes (CSV)</h2>
+        <h2><i class="bi bi-file-earmark-arrow-up me-2 text-primary"></i> Carga masiva de votantes (CSV)</h2>
       </div>
       <div class="panel-card__body">
         <p class="small text-muted mb-3">
-          Sube la base de datos con los votantes autorizados para la edición 2027. El archivo debe contener columnas de <code>documento</code> y <code>correo</code>.
+          Selecciona la edición a la que pertenece el padrón. CSV UTF-8 de hasta 5 MB y 10.000 registros, con encabezados <code>documento</code> y <code>correo</code>.
         </p>
 
-        <form id="csvUploadForm">
-          <div class="dropzone mb-3" id="csvDropzone">
-            <i class="bi bi-cloud-arrow-up d-block mb-2"></i>
-            <span class="d-block fw-bold mb-1">Arrastra tu archivo CSV aquí</span>
-            <span class="small text-muted d-block mb-3">o presiona para examinar en tu equipo</span>
-            <input type="file" id="csvFileInput" accept=".csv" class="d-none">
-            <button type="button" class="btn btn-sm btn-vf-outline" onclick="document.getElementById('csvFileInput').click()">
-              Seleccionar archivo .CSV
-            </button>
-            <div id="selectedFileName" class="mt-2 small fw-bold text-success d-none"></div>
-          </div>
+        {% if ediciones %}
+          <form id="csvUploadForm" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
 
-          <div class="d-grid">
-            <button type="submit" class="btn btn-vf" id="btnSimulateUpload" disabled>
-              <i class="bi bi-gear-wide-connected me-1"></i> Simular procesamiento de archivo
-            </button>
-          </div>
-        </form>
+            <div class="mb-3">
+              {{ form.edicion.label_tag }}
+              {{ form.edicion }}
+              {% for error in form.edicion.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
 
-        <!-- Resumen de Validación Simulado -->
-        <div id="uploadSummaryBox" class="mt-4 p-3 bg-light rounded-3 border d-none">
-          <h3 class="h6 mb-2 fw-bold text-dark"><i class="bi bi-check-circle-fill text-success me-1"></i> Resultado del Análisis (Simulado):</h3>
-          <ul class="list-unstyled small mb-2">
-            <li><strong class="text-success">Filas válidas leídas:</strong> 118 registros</li>
-            <li><strong class="text-danger">Filas con inconsistencias:</strong> 7 registros</li>
-          </ul>
-          <div class="alert alert-warning py-2 px-3 small mb-0">
-            <strong>Observaciones:</strong> 3 correos con sintaxis inválida, 2 cédulas vacías y 2 registros duplicados descartados.
+            <div class="dropzone mb-3" id="csvDropzone">
+              <i class="bi bi-cloud-arrow-up d-block mb-2" aria-hidden="true"></i>
+              <span class="d-block fw-bold mb-1">Arrastra tu archivo CSV aquí</span>
+              <span class="small text-muted d-block mb-3">o selecciónalo desde tu equipo</span>
+              {{ form.archivo }}
+              <div id="selectedFileName" class="mt-2 small fw-bold text-success"></div>
+              {% for error in form.archivo.errors %}<div class="text-danger small mt-2">{{ error }}</div>{% endfor %}
+            </div>
+
+            {% if upload_errors %}
+              <div class="alert alert-danger small" role="alert">
+                <strong>Corrige las filas indicadas; no se importó ningún registro.</strong>
+                <ul class="mb-0 mt-2">
+                  {% for error in upload_errors %}<li>{{ error }}</li>{% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-vf" id="btnUploadCensus">
+                <i class="bi bi-database-check me-1"></i> Validar e importar padrón
+              </button>
+            </div>
+          </form>
+        {% else %}
+          <div class="alert alert-warning mb-0">
+            Primero crea una <a href="{% url 'panel:ediciones' %}">edición del festival</a> para importar su padrón.
           </div>
-        </div>
+        {% endif %}
 
         <div class="vf-alert vf-alert--demo mt-3">
-          <i class="bi bi-shield-lock"></i>
+          <i class="bi bi-shield-lock" aria-hidden="true"></i>
           <div class="small">
-            <strong>Seguridad de Datos:</strong> Ningún archivo se envía a servidores. La validación criptográfica y almacenamiento seguro del padrón se implementarán en la capa Django / MySQL.
+            <strong>Tratamiento de datos:</strong> el CSV se envía a esta aplicación para procesarlo; el archivo original no se conserva. Los documentos y correos importados se guardan en la base de datos y solo se muestran enmascarados en este panel. En despliegues remotos, usa HTTPS y limita el acceso al panel.
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Tabla de Registros del Padrón (Enmascarados) -->
   <div class="col-lg-7">
     <div class="panel-card mb-4">
       <div class="panel-card__head">
-        <h2><i class="bi bi-person-check me-2 text-primary"></i> Muestra de Votantes en Padrón (Enmascarados)</h2>
-        <span class="badge bg-secondary">Datos Demo</span>
+        <h2><i class="bi bi-person-check me-2 text-primary"></i> Padrón electoral</h2>
+        {% if selected_edicion %}
+          <span class="badge bg-secondary">{{ selected_edicion.nombre }} · {{ total_votantes }} votante(s)</span>
+        {% endif %}
       </div>
-      <div class="table-responsive">
+
+      {% if ediciones %}
+        <form class="px-3 pt-3" method="get">
+          <label class="form-label" for="rosterEdition">Consultar edición</label>
+          <select class="form-select" id="rosterEdition" name="edicion" onchange="this.form.submit()">
+            {% for edicion in ediciones %}
+              <option value="{{ edicion.pk }}" {% if selected_edicion.pk == edicion.pk %}selected{% endif %}>
+                {{ edicion.nombre }} ({{ edicion.anio }})
+              </option>
+            {% endfor %}
+          </select>
+        </form>
+      {% endif %}
+
+      <div class="table-responsive mt-3">
         <table class="table table-hover align-middle mb-0" id="votersTable">
           <thead>
             <tr>
-              <th>Identificación (Ofuscada)</th>
-              <th>Correo (Ofuscado)</th>
+              <th>Identificación (ofuscada)</th>
+              <th>Correo (ofuscado)</th>
               <th>Estado</th>
-              <th>Integridad</th>
             </tr>
           </thead>
-          <tbody>
-            <!-- Render dinámico desde admin.js con datos enmascarados -->
+          <tbody data-source="database">
+            {% for votante in votantes %}
+              <tr>
+                <td><span class="vf-mono">{{ votante.documento }}</span></td>
+                <td><span class="vf-mono">{{ votante.correo }}</span></td>
+                <td>
+                  {% if votante.habilitado %}
+                    <span class="vf-status vf-status--activa">Habilitado</span>
+                  {% else %}
+                    <span class="vf-status vf-status--inactiva">No habilitado</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="3" class="text-center py-4 text-muted">No hay votantes cargados para esta edición.</td></tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>
+
+      {% if page_obj and page_obj.paginator.num_pages > 1 %}
+        <nav class="p-3" aria-label="Paginación del padrón">
+          <ul class="pagination justify-content-center mb-0">
+            {% if page_obj.has_previous %}
+              <li class="page-item"><a class="page-link" href="?edicion={{ selected_edicion.pk }}&page={{ page_obj.previous_page_number }}">Anterior</a></li>
+            {% else %}
+              <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+            {% endif %}
+            <li class="page-item disabled"><span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
+            {% if page_obj.has_next %}
+              <li class="page-item"><a class="page-link" href="?edicion={{ selected_edicion.pk }}&page={{ page_obj.next_page_number }}">Siguiente</a></li>
+            {% else %}
+              <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+            {% endif %}
+          </ul>
+        </nav>
+      {% endif %}
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function () {
+    const input = document.getElementById("id_archivo");
+    const dropzone = document.getElementById("csvDropzone");
+    const fileName = document.getElementById("selectedFileName");
+    if (!input || !dropzone || !fileName) return;
+
+    function displayFile(file) {
+      if (!file) return;
+      const transfer = new DataTransfer();
+      transfer.items.add(file);
+      input.files = transfer.files;
+      fileName.textContent = "Archivo seleccionado: " + file.name;
+    }
+
+    input.addEventListener("change", function () {
+      fileName.textContent = input.files.length
+        ? "Archivo seleccionado: " + input.files[0].name
+        : "";
+    });
+    dropzone.addEventListener("dragover", function (event) {
+      event.preventDefault();
+    });
+    dropzone.addEventListener("drop", function (event) {
+      event.preventDefault();
+      displayFile(event.dataTransfer.files[0]);
+    });
+  })();
+</script>
 {% endblock %}

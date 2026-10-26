@@ -23,6 +23,11 @@
     var tbody = document.querySelector('#dashVotesTable tbody');
     var alertsBox = document.getElementById('dashAlertsContainer');
 
+    if (
+      (tbody && tbody.dataset.source === 'database') ||
+      (alertsBox && alertsBox.dataset.source === 'database')
+    ) return;
+
     // Cargar alertas
     if (alertsBox && VF.data.alertas) {
       alertsBox.innerHTML = '';
@@ -63,6 +68,10 @@
 
     var edTable = document.querySelector('#editionsTable tbody');
     var catTable = document.querySelector('#categoriesTable tbody');
+    if (
+      (edTable && edTable.dataset.source === 'database') ||
+      (catTable && catTable.dataset.source === 'database')
+    ) return;
 
     // Render Ediciones
     if (edTable) {
@@ -223,6 +232,8 @@
     var form = document.getElementById('voteProcessForm');
     var catSelect = document.getElementById('vpCategorySelect');
 
+    if (!tbody) return;
+
     // Llenar categorías en modal
     if (catSelect) {
       catSelect.innerHTML = '';
@@ -320,6 +331,7 @@
     if (!VF.data) return;
 
     var tbody = document.querySelector('#votersTable tbody');
+    if (tbody && tbody.dataset.source === 'database') return;
     var dropzone = document.getElementById('csvDropzone');
     var fileInput = document.getElementById('csvFileInput');
     var fileNameEl = document.getElementById('selectedFileName');

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
@@ -182,6 +183,90 @@ class Opcion(models.Model):
                 name="opcion_unica_por_votacion"
             )
         ]
+
+
+class Voto(models.Model):
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="votos",
+        verbose_name="Usuario",
+    )
+    edicion = models.ForeignKey(
+        Edicion,
+        on_delete=models.PROTECT,
+        related_name="votos",
+        verbose_name="Edición",
+    )
+    categoria = models.ForeignKey(
+        Categoria,
+        on_delete=models.PROTECT,
+        related_name="votos",
+        verbose_name="Categoría",
+    )
+    votacion = models.ForeignKey(
+        Votacion,
+        on_delete=models.PROTECT,
+        related_name="votos",
+        verbose_name="Votación",
+    )
+    opcion = models.ForeignKey(
+        Opcion,
+        on_delete=models.PROTECT,
+        related_name="votos",
+        verbose_name="Opción",
+    )
+    fecha_hora = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Fecha y hora",
+    )
+
+    class Meta:
+        verbose_name = "Voto"
+        verbose_name_plural = "Votos"
+        ordering = ["-fecha_hora"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["usuario", "categoria", "edicion"],
+                name="voto_unico_usuario_categoria_edicion",
+            )
+        ]
+
+    def clean(self):
+        errores = {}
+
+        if self.categoria_id and self.edicion_id:
+            if self.categoria.edicion_id != self.edicion_id:
+                errores["categoria"] = (
+                    "La categoría no pertenece a la edición seleccionada."
+                )
+
+        if self.votacion_id and self.categoria_id:
+            if self.votacion.categoria_id != self.categoria_id:
+                errores["votacion"] = (
+                    "La votación no pertenece a la categoría seleccionada."
+                )
+
+        if self.opcion_id and self.votacion_id:
+            if self.opcion.votacion_id != self.votacion_id:
+                errores["opcion"] = (
+                    "La opción no pertenece a la votación seleccionada."
+                )
+
+        if errores:
+            raise ValidationError(errores)
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
+    def __str__(self):
+        return (
+            f"{self.usuario} - {self.categoria} - "
+            f"{self.opcion}"
+        )
+
+
 
     def __str__(self):
         return f"{self.nombre} - {self.votacion.titulo}"

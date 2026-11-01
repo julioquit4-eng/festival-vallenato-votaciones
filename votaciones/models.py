@@ -265,8 +265,3 @@ class Voto(models.Model):
             f"{self.usuario} - {self.categoria} - "
             f"{self.opcion}"
         )
-
-
-
-    def __str__(self):
-        return f"{self.nombre} - {self.votacion.titulo}"

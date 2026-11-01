@@ -71,3 +71,61 @@ def panel_votantes(request):
 
 def panel_reportes(request):
     return render(request, "panel/reportes.html")
+
+from django.http import JsonResponse
+from .models import Edicion
+
+def api_categorias(request):
+    ediciones = (
+        Edicion.objects.filter(activa=True)
+        .prefetch_related(
+            "categorias__votaciones__opciones"
+        )
+    )
+
+    data = []
+
+    for edicion in ediciones:
+        categorias_data = []
+
+        for categoria in edicion.categorias.filter(activa=True):
+            votaciones_data = []
+
+            for votacion in categoria.votaciones.all():
+                opciones_data = []
+
+                for opcion in votacion.opciones.filter(activa=True):
+                    opciones_data.append(
+                        {
+                            "id": opcion.id,
+                            "nombre": opcion.nombre,
+                        }
+                    )
+
+                votaciones_data.append(
+                    {
+                        "id": votacion.id,
+                        "titulo": votacion.titulo,
+                        "estado": votacion.estado,
+                        "opciones": opciones_data,
+                    }
+                )
+
+            categorias_data.append(
+                {
+                    "id": categoria.id,
+                    "nombre": categoria.nombre,
+                    "votaciones": votaciones_data,
+                }
+            )
+
+        data.append(
+            {
+                "id": edicion.id,
+                "nombre": edicion.nombre,
+                "anio": edicion.anio,
+                "categorias": categorias_data,
+            }
+        )
+
+    return JsonResponse(data, safe=False)

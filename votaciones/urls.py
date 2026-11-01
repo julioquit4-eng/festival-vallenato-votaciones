@@ -6,6 +6,11 @@ from . import views
 public_patterns = (
     [
         path("", views.inicio, name="inicio"),
+	path(
+    		"api/categorias/",
+    		views.api_categorias,
+    		name="api_categorias",
+	),
         path(
             "votaciones/",
             views.votaciones_publicas,

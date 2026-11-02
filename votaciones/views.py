@@ -1,4 +1,7 @@
+from uuid import uuid4
+
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.admin.views.decorators import staff_member_required
@@ -12,6 +15,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 from .forms import (
+    AccesoVotanteForm,
     CategoriaForm,
     CensoUploadForm,
     EdicionForm,
@@ -102,7 +106,7 @@ def detalle_votacion(request):
 
 
 def acceso_votante(request):
-    return render(request, "public/acceso_votante.html")
+    return redirect("public:login")
 
 
 def confirmar_voto(request):
@@ -129,29 +133,106 @@ def login(request):
     if request.user.is_staff:
         return redirect("panel:dashboard")
 
-    form = AuthenticationForm(
+    rol = request.POST.get("rol") or request.GET.get("rol")
+    next_url = request.POST.get("next") or request.GET.get("next", "")
+    if rol not in {"votante", "administrador"}:
+        rol = (
+            "administrador"
+            if next_url.startswith(reverse("panel:dashboard"))
+            else "votante"
+        )
+
+    admin_form = AuthenticationForm(
         request,
-        data=request.POST or None,
+        data=request.POST
+        if request.method == "POST" and rol == "administrador"
+        else None,
     )
-    if request.method == "POST" and form.is_valid():
-        usuario = form.get_user()
-        if not usuario.is_staff:
-            form.add_error(
+    votante_form = AccesoVotanteForm(
+        request.POST if request.method == "POST" and rol == "votante" else None,
+    )
+
+    if request.method == "POST" and rol == "administrador":
+        if admin_form.is_valid():
+            usuario = admin_form.get_user()
+            if not usuario.is_staff:
+                admin_form.add_error(
+                    None,
+                    "Esta cuenta no tiene acceso al panel administrativo.",
+                )
+            else:
+                auth_login(request, usuario)
+                request.session.set_expiry(
+                    None if request.POST.get("recordar_sesion") else 0
+                )
+                if next_url and url_has_allowed_host_and_scheme(
+                    next_url,
+                    allowed_hosts={request.get_host()},
+                    require_https=request.is_secure(),
+                ):
+                    return redirect(next_url)
+                return redirect("panel:dashboard")
+
+    if request.method == "POST" and rol == "votante" and votante_form.is_valid():
+        edicion = Edicion.objects.filter(activa=True).order_by("-anio").first()
+        if edicion is None:
+            votante_form.add_error(
                 None,
-                "Esta cuenta no tiene acceso al panel administrativo.",
+                "El padrón de votantes no está habilitado actualmente.",
             )
         else:
-            auth_login(request, usuario)
-            destino = request.POST.get("next") or request.GET.get("next")
-            if destino and url_has_allowed_host_and_scheme(
-                destino,
-                allowed_hosts={request.get_host()},
-                require_https=request.is_secure(),
-            ):
-                return redirect(destino)
-            return redirect("panel:dashboard")
+            with transaction.atomic():
+                votante = (
+                    Votante.objects.select_for_update()
+                    .select_related("usuario")
+                    .filter(
+                        edicion=edicion,
+                        documento__iexact=votante_form.cleaned_data["documento"],
+                        correo__iexact=votante_form.cleaned_data["correo"],
+                        habilitado=True,
+                    )
+                    .first()
+                )
+                if votante is None:
+                    votante_form.add_error(
+                        None,
+                        "El documento y correo no coinciden con un votante habilitado del padrón.",
+                    )
+                else:
+                    usuario = votante.usuario
+                    if usuario is None:
+                        usuario_model = get_user_model()
+                        usuario = usuario_model.objects.create_user(
+                            username=f"votante-{uuid4().hex}",
+                        )
+                        usuario.set_unusable_password()
+                        usuario.save(update_fields=["password"])
+                        votante.usuario = usuario
+                        votante.save(update_fields=["usuario", "actualizado_en"])
 
-    return render(request, "public/login.html", {"form": form})
+                    if not usuario.is_active or usuario.is_staff:
+                        votante_form.add_error(
+                            None,
+                            "No fue posible iniciar sesión con este registro del padrón.",
+                        )
+                    else:
+                        auth_login(
+                            request,
+                            usuario,
+                            backend="django.contrib.auth.backends.ModelBackend",
+                        )
+                        return redirect("public:votaciones")
+
+    return render(
+        request,
+        "public/login.html",
+        {
+            "admin_form": admin_form,
+            "votante_form": votante_form,
+            "active_tab": rol,
+            "next": next_url,
+        },
+    )
 
 
 @require_POST

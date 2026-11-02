@@ -228,3 +228,38 @@ class CensoUploadForm(forms.Form):
 
         self.registros = registros
         return archivo
+
+
+class AccesoVotanteForm(forms.Form):
+    documento = forms.CharField(
+        label="Número de cédula",
+        max_length=32,
+        strip=True,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "autocomplete": "off",
+                "inputmode": "text",
+            }
+        ),
+    )
+    correo = forms.EmailField(
+        label="Correo electrónico registrado",
+        max_length=254,
+        widget=forms.EmailInput(
+            attrs={"class": "form-control", "autocomplete": "email"}
+        ),
+    )
+    acepta_datos = forms.BooleanField(
+        label="Acepto la política de tratamiento de datos personales.",
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        error_messages={
+            "required": "Debes aceptar la política de tratamiento de datos.",
+        },
+    )
+
+    def clean_documento(self):
+        return self.cleaned_data["documento"].strip().upper()
+
+    def clean_correo(self):
+        return self.cleaned_data["correo"].strip().lower()

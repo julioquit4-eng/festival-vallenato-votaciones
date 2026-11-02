@@ -3,7 +3,7 @@ from datetime import timedelta
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
 
@@ -12,11 +12,29 @@ from .models import Categoria, Edicion, Opcion, Votacion, Votante, Voto
 
 class AdminAuthenticationTests(TestCase):
     def setUp(self):
+        hoy = timezone.localdate()
+        self.edicion = Edicion.objects.create(
+            nombre="Festival de prueba",
+            anio=2088,
+            fecha_inicio=hoy,
+            fecha_fin=hoy + timedelta(days=3),
+            activa=True,
+        )
         self.admin = get_user_model().objects.create_user(
             username="admin",
             password="secure-test-password",
             is_staff=True,
         )
+
+    def crear_votante(self, **overrides):
+        datos = {
+            "edicion": self.edicion,
+            "documento": "12345678",
+            "correo": "persona@example.com",
+            "habilitado": True,
+        }
+        datos.update(overrides)
+        return Votante.objects.create(**datos)
 
     def test_panel_requires_authenticated_staff_user(self):
         panel_routes = (
@@ -37,7 +55,11 @@ class AdminAuthenticationTests(TestCase):
     def test_staff_user_can_log_in_and_open_panel(self):
         response = self.client.post(
             reverse("public:login"),
-            {"username": "admin", "password": "secure-test-password"},
+            {
+                "rol": "administrador",
+                "username": "admin",
+                "password": "secure-test-password",
+            },
         )
 
         self.assertRedirects(response, reverse("panel:dashboard"))
@@ -52,6 +74,7 @@ class AdminAuthenticationTests(TestCase):
             {
                 "username": "admin",
                 "password": "secure-test-password",
+                "rol": "administrador",
                 "next": "https://example.com/",
             },
         )
@@ -61,7 +84,11 @@ class AdminAuthenticationTests(TestCase):
     def test_staff_login_redirects_to_requested_panel_page(self):
         response = self.client.post(
             f"{reverse('public:login')}?next={reverse('panel:votaciones')}",
-            {"username": "admin", "password": "secure-test-password"},
+            {
+                "rol": "administrador",
+                "username": "admin",
+                "password": "secure-test-password",
+            },
         )
 
         self.assertRedirects(response, reverse("panel:votaciones"))
@@ -74,11 +101,28 @@ class AdminAuthenticationTests(TestCase):
 
         response = self.client.post(
             reverse("public:login"),
-            {"username": "voter", "password": "secure-test-password"},
+            {
+                "rol": "administrador",
+                "username": "voter",
+                "password": "secure-test-password",
+            },
         )
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "no tiene acceso al panel administrativo")
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_administrator_login_rejects_an_incorrect_password(self):
+        response = self.client.post(
+            reverse("public:login"),
+            {
+                "rol": "administrador",
+                "username": "admin",
+                "password": "cualquier-clave",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
         self.assertNotIn("_auth_user_id", self.client.session)
 
     def test_logout_requires_post_and_ends_session(self):
@@ -90,6 +134,159 @@ class AdminAuthenticationTests(TestCase):
         post_response = self.client.post(reverse("public:cerrar_sesion"))
         self.assertRedirects(post_response, reverse("public:inicio"))
         self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_login_page_has_voter_and_administrator_tabs(self):
+        response = self.client.get(reverse("public:login"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Acceso de Votantes:")
+        self.assertContains(response, "Número de cédula")
+        self.assertContains(response, "Área Administrativa:")
+        self.assertContains(response, "Contraseña")
+        self.assertContains(response, "csrfmiddlewaretoken")
+        self.assertNotContains(response, "cualquier clave")
+
+    def test_voter_login_validates_roster_and_creates_django_session(self):
+        votante = self.crear_votante()
+
+        response = self.client.post(
+            reverse("public:login"),
+            {
+                "rol": "votante",
+                "documento": "12345678",
+                "correo": "PERSONA@example.com",
+                "acepta_datos": "on",
+            },
+        )
+
+        self.assertRedirects(response, reverse("public:votaciones"))
+        votante.refresh_from_db()
+        self.assertIsNotNone(votante.usuario)
+        self.assertTrue(votante.usuario.is_active)
+        self.assertFalse(votante.usuario.is_staff)
+        self.assertFalse(votante.usuario.has_usable_password())
+        self.assertEqual(
+            str(self.client.session["_auth_user_id"]),
+            str(votante.usuario_id),
+        )
+        usuario_id = votante.usuario_id
+        self.client.post(
+            reverse("public:cerrar_sesion"),
+        )
+        self.client.post(
+            reverse("public:login"),
+            {
+                "rol": "votante",
+                "documento": "12345678",
+                "correo": "persona@example.com",
+                "acepta_datos": "on",
+            },
+        )
+        votante.refresh_from_db()
+        self.assertEqual(votante.usuario_id, usuario_id)
+        self.assertEqual(get_user_model().objects.filter(is_staff=False).count(), 1)
+
+    def test_voter_login_rejects_wrong_email_and_disabled_roster_entry(self):
+        votante = self.crear_votante()
+        response = self.client.post(
+            reverse("public:login"),
+            {
+                "rol": "votante",
+                "documento": votante.documento,
+                "correo": "incorrecto@example.com",
+                "acepta_datos": "on",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            "no coinciden con un votante habilitado del padrón",
+        )
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+        votante.habilitado = False
+        votante.save()
+        response = self.client.post(
+            reverse("public:login"),
+            {
+                "rol": "votante",
+                "documento": votante.documento,
+                "correo": votante.correo,
+                "acepta_datos": "on",
+            },
+        )
+        self.assertContains(
+            response,
+            "no coinciden con un votante habilitado del padrón",
+        )
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_voter_login_requires_accepting_data_policy(self):
+        self.crear_votante()
+
+        response = self.client.post(
+            reverse("public:login"),
+            {
+                "rol": "votante",
+                "documento": "12345678",
+                "correo": "persona@example.com",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            "Debes aceptar la política de tratamiento de datos.",
+        )
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_legacy_voter_access_route_uses_real_login(self):
+        response = self.client.get(reverse("public:acceso_votante"))
+
+        self.assertRedirects(response, reverse("public:login"))
+
+    def test_voter_login_does_not_grant_panel_access(self):
+        self.crear_votante()
+        self.client.post(
+            reverse("public:login"),
+            {
+                "rol": "votante",
+                "documento": "12345678",
+                "correo": "persona@example.com",
+                "acepta_datos": "on",
+            },
+        )
+
+        response = self.client.get(reverse("panel:dashboard"))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.url.startswith(reverse("public:login")))
+
+    def test_login_forms_require_csrf(self):
+        client = Client(enforce_csrf_checks=True)
+        client.get(reverse("public:login"))
+
+        admin_response = client.post(
+            reverse("public:login"),
+            {
+                "rol": "administrador",
+                "username": self.admin.username,
+                "password": "secure-test-password",
+            },
+        )
+        self.assertEqual(admin_response.status_code, 403)
+
+        voter_response = client.post(
+            reverse("public:login"),
+            {
+                "rol": "votante",
+                "documento": "12345678",
+                "correo": "persona@example.com",
+                "acepta_datos": "on",
+            },
+        )
+        self.assertEqual(voter_response.status_code, 403)
 
 
 class PublicVotingViewsTests(TestCase):

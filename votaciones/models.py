@@ -273,6 +273,14 @@ class Voto(models.Model):
 
 
 class Votante(models.Model):
+    usuario = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name="registro_votante",
+        null=True,
+        blank=True,
+        verbose_name="Cuenta de usuario",
+    )
     edicion = models.ForeignKey(
         Edicion,
         on_delete=models.CASCADE,

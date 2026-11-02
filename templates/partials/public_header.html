@@ -19,10 +19,14 @@
           <li class="nav-item"><a class="nav-link" data-nav="guia" href="{% url 'public:guia' %}">Guía de participación</a></li>
         </ul>
         <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-2 mt-3 mt-lg-0">
-          {% if request.user.is_staff %}
-            <a class="btn btn-vf-outline btn-sm" href="{% url 'panel:dashboard' %}">
-              <i class="bi bi-speedometer2" aria-hidden="true"></i>Panel administrativo
-            </a>
+          {% if request.user.is_authenticated %}
+            {% if request.user.is_staff %}
+              <a class="btn btn-vf-outline btn-sm" href="{% url 'panel:dashboard' %}">
+                <i class="bi bi-speedometer2" aria-hidden="true"></i>Panel administrativo
+              </a>
+            {% else %}
+              <span class="small text-muted">Sesión de votante activa</span>
+            {% endif %}
             <form method="post" action="{% url 'public:cerrar_sesion' %}">
               {% csrf_token %}
               <button type="submit" class="btn btn-vf btn-sm">
@@ -31,7 +35,7 @@
             </form>
           {% else %}
             <a class="btn btn-vf-outline btn-sm" id="headerBtnLogin" href="{% url 'public:login' %}">
-              <i class="bi bi-person-circle" aria-hidden="true"></i>Acceso administrativo
+              <i class="bi bi-person-circle" aria-hidden="true"></i>Iniciar sesión
             </a>
             <a class="btn btn-vf btn-sm" id="headerCtaVotar" href="{% url 'public:votaciones' %}">
               <i class="bi bi-list-check" aria-hidden="true"></i>Consultar votaciones

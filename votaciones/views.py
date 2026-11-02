@@ -14,10 +14,11 @@ from django.db import IntegrityError, transaction
 from django.db.models import Count
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
+from django.urls import Resolver404, resolve, reverse
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods, require_POST
+from urllib.parse import urlsplit
 
 from .forms import (
     AccesoVotanteForm,
@@ -348,6 +349,26 @@ def login(request):
 
     rol = request.POST.get("rol") or request.GET.get("rol")
     next_url = request.POST.get("next") or request.GET.get("next", "")
+    if (
+        request.method == "GET"
+        and not request.user.is_authenticated
+        and next_url
+        and url_has_allowed_host_and_scheme(
+            next_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        )
+    ):
+        try:
+            next_view = resolve(urlsplit(next_url).path)
+        except Resolver404:
+            next_view = None
+        if next_view and next_view.view_name == "public:emitir_voto":
+            messages.info(
+                request,
+                "Inicia sesión como votante habilitado para continuar con tu voto.",
+            )
+
     if rol not in {"votante", "administrador"}:
         rol = (
             "administrador"

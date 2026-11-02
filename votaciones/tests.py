@@ -1281,11 +1281,15 @@ class FlujoRegistroVotoTests(TestCase):
         response = self.client.post(
             self.url,
             {"opcion": self.opcion.pk},
+            follow=True,
         )
 
-        self.assertEqual(response.status_code, 302)
-        self.assertIn(reverse("public:login"), response.url)
-        self.assertIn("next=", response.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.redirect_chain[0][0].split("?")[0], reverse("public:login"))
+        self.assertContains(
+            response,
+            "Inicia sesión como votante habilitado para continuar con tu voto.",
+        )
         self.assertEqual(Voto.objects.count(), 0)
 
     def test_voter_login_returns_to_requested_voting_flow(self):

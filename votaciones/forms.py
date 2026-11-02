@@ -263,3 +263,33 @@ class AccesoVotanteForm(forms.Form):
 
     def clean_correo(self):
         return self.cleaned_data["correo"].strip().lower()
+
+
+class VotoForm(forms.Form):
+    opcion = forms.ModelChoiceField(
+        queryset=Opcion.objects.none(),
+        widget=forms.RadioSelect,
+        error_messages={
+            "required": "Selecciona una opción para continuar.",
+            "invalid_choice": (
+                "La opción seleccionada no pertenece a esta votación o no está activa."
+            ),
+        },
+    )
+
+    def __init__(self, votacion: Votacion, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["opcion"].queryset = Opcion.objects.filter(
+            votacion=votacion,
+            activa=True,
+        )
+
+
+class ConfirmarVotoForm(VotoForm):
+    confirmar = forms.BooleanField(
+        required=True,
+        widget=forms.HiddenInput,
+        error_messages={
+            "required": "Debes confirmar tu selección para registrar el voto.",
+        },
+    )

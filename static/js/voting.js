@@ -162,6 +162,7 @@
 
     var container = document.getElementById('featuredVotes');
     var statAbiertas = document.querySelector('[data-stat="abiertas"]');
+    if (container && container.dataset.source === 'database') return;
     if (!VF.data) return;
 
     var abiertas = VF.data.votaciones.filter(function (v) { return v.estado === 'abierta'; });
@@ -525,6 +526,7 @@
      PANTALLA 5: CONFIRMACIÓN DEL VOTO Y SEGUNDA CONFIRMACIÓN MODAL
      ------------------------------------------------------------------------- */
   VF.pages.confirmar_voto = function () {
+    if (document.getElementById('serverVoteConfirmation')) return;
     if (!VF.data || !VF.q) return;
 
     var voteId = getActiveVoteId();
@@ -584,6 +586,7 @@
      PANTALLA 6: COMPROBANTE DE VOTO
      ------------------------------------------------------------------------- */
   VF.pages.comprobante = function () {
+    if (document.getElementById('serverVoteReceipt')) return;
     if (!VF.data || !VF.q) return;
 
     var voteId = getActiveVoteId();

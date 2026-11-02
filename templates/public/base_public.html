@@ -8,6 +8,13 @@
 {% block layout %}
   {% include "partials/public_header.html" %}
   <main id="contenido" tabindex="-1">
+    {% if messages %}
+      <div class="container mt-3" aria-live="polite">
+        {% for message in messages %}
+          <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags|default:'info' }}{% endif %}" role="alert">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
     {% block content %}{% endblock %}
   </main>
   {% include "partials/public_footer.html" %}

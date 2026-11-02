@@ -17,6 +17,11 @@ public_patterns = (
             name="detalle_votacion",
         ),
         path(
+            "votaciones/<int:votacion_id>/votar/",
+            views.emitir_voto,
+            name="emitir_voto",
+        ),
+        path(
             "votaciones/acceso/",
             views.acceso_votante,
             name="acceso_votante",
@@ -55,6 +60,16 @@ public_patterns = (
             "cerrar-sesion/",
             views.cerrar_sesion,
             name="cerrar_sesion",
+        ),
+        path(
+            "mis-votos/",
+            views.categorias_votadas,
+            name="categorias_votadas",
+        ),
+        path(
+            "votaciones/comprobante/<int:voto_id>/",
+            views.comprobante_voto,
+            name="comprobante_voto",
         ),
     ],
     "public",

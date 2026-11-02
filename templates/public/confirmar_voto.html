@@ -1,16 +1,40 @@
 {% extends "public/base_public.html" %}
 
-{% block title %}Confirmación de voto{% endblock %}
+{% block title %}Confirma tu voto{% endblock %}
 {% block page_id %}confirmar_voto{% endblock %}
 {% block nav_section %}votaciones{% endblock %}
 
 {% block content %}
 <div class="container my-5">
-  <div class="vf-empty">
-    <i class="bi bi-info-circle" aria-hidden="true"></i>
-    <h1 class="h3">El registro de votos aún no está disponible</h1>
-    <p class="text-muted">No se ha recibido ni registrado ningún voto. La participación se habilitará cuando esté listo el padrón de votantes y el registro seguro de sufragios.</p>
-    <a href="{% url 'public:votaciones' %}" class="btn btn-vf-outline mt-2">Volver a votaciones</a>
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <article id="serverVoteConfirmation" class="summary-card vf-card vf-card--pad">
+        <h1 class="h3 mb-4">Confirma tu elección</h1>
+        <dl class="row">
+          <dt class="col-sm-4">Votación</dt>
+          <dd class="col-sm-8">{{ votacion.titulo }}</dd>
+          <dt class="col-sm-4">Categoría</dt>
+          <dd class="col-sm-8">{{ votacion.categoria.nombre }}</dd>
+          <dt class="col-sm-4">Opción elegida</dt>
+          <dd class="col-sm-8 fw-bold">{{ opcion.nombre }}</dd>
+        </dl>
+        <div class="vf-alert vf-alert--warning" role="alert">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <div>Después de confirmar, tu voto será definitivo y no podrás votar de nuevo en esta categoría.</div>
+        </div>
+        <form method="post" action="{{ voto_url }}" class="d-flex flex-wrap justify-content-between gap-3 mt-4">
+          {% csrf_token %}
+          <input type="hidden" name="opcion" value="{{ opcion.pk }}">
+          <input type="hidden" name="confirmar" value="1">
+          <a href="{% url 'public:detalle_votacion' %}?v={{ votacion.pk }}" class="btn btn-vf-outline">
+            <i class="bi bi-arrow-left"></i> Cambiar selección
+          </a>
+          <button type="submit" class="btn btn-vf">
+            Confirmar y registrar voto <i class="bi bi-check2-circle"></i>
+          </button>
+        </form>
+      </article>
+    </div>
   </div>
 </div>
 {% endblock %}

@@ -6,11 +6,43 @@
 
 {% block content %}
 <div class="container my-5">
-  <div class="vf-empty">
-    <i class="bi bi-receipt" aria-hidden="true"></i>
-    <h1 class="h3">No hay comprobantes disponibles</h1>
-    <p class="text-muted">Solo se genera un comprobante después de registrar un voto. Esa función aún no está habilitada.</p>
-    <a href="{% url 'public:votaciones' %}" class="btn btn-vf-outline mt-2">Volver a votaciones</a>
-  </div>
+  <article id="serverVoteReceipt" class="receipt vf-reveal" aria-labelledby="receiptTitle">
+    <div class="receipt__head">
+      <div class="receipt__icon" aria-hidden="true"><i class="bi bi-check-lg"></i></div>
+      <span class="vf-eyebrow vf-eyebrow--light mt-3">Comprobante de participación</span>
+      <h1 id="receiptTitle">¡Tu voto fue registrado!</h1>
+      <p class="text-white-50 small mb-0">El sentido de tu voto es confidencial.</p>
+    </div>
+    <div class="receipt__perforation" aria-hidden="true"></div>
+    <div class="receipt__body">
+      <div class="vf-alert vf-alert--success mb-4 d-print-none" role="status">
+        <i class="bi bi-shield-check"></i>
+        <div class="small"><strong>Registro confirmado.</strong> Conserva el número de comprobante para tus registros.</div>
+      </div>
+      <dl class="row mb-4">
+        <dt class="col-sm-4 text-muted">Votación:</dt>
+        <dd class="col-sm-8 fw-bold">{{ voto.votacion.titulo }}</dd>
+        <dt class="col-sm-4 text-muted">Categoría:</dt>
+        <dd class="col-sm-8">{{ voto.categoria.nombre }}</dd>
+        <dt class="col-sm-4 text-muted">Edición:</dt>
+        <dd class="col-sm-8">{{ voto.categoria.edicion.nombre }} · {{ voto.categoria.edicion.anio }}</dd>
+        <dt class="col-sm-4 text-muted">Fecha y hora:</dt>
+        <dd class="col-sm-8">{{ voto.fecha_hora|date:"d/m/Y H:i" }}</dd>
+        <dt class="col-sm-4 text-muted">Comprobante:</dt>
+        <dd class="col-sm-8 vf-mono">VF-{{ voto.pk }}</dd>
+      </dl>
+      <div class="d-flex flex-wrap justify-content-between gap-3 pt-3 border-top d-print-none">
+        <a href="{% url 'public:votaciones' %}" class="btn btn-vf-outline">
+          <i class="bi bi-house"></i> Volver a votaciones
+        </a>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-vf-outline" data-action="print">
+            <i class="bi bi-printer"></i> Imprimir comprobante
+          </button>
+          <a href="{% url 'public:categorias_votadas' %}" class="btn btn-vf">Ver mi participación</a>
+        </div>
+      </div>
+    </div>
+  </article>
 </div>
 {% endblock %}

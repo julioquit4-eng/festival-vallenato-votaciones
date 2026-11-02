@@ -377,7 +377,7 @@ class PublicVotingViewsTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.opcion.nombre)
-        self.assertContains(response, "registro de votos")
+        self.assertContains(response, "Inicia sesión como votante")
 
     def test_detail_returns_not_found_for_missing_votation(self):
         response = self.client.get(
@@ -1019,3 +1019,305 @@ class VotoModelTests(TestCase):
             )
 
         self.assertEqual(Voto.objects.count(), 0)
+
+
+class FlujoRegistroVotoTests(TestCase):
+    def setUp(self):
+        usuario_model = get_user_model()
+        hoy = timezone.localdate()
+        ahora = timezone.now()
+        self.edicion = Edicion.objects.create(
+            nombre="Festival del voto",
+            anio=2093,
+            fecha_inicio=hoy,
+            fecha_fin=hoy + timedelta(days=5),
+            activa=True,
+        )
+        self.categoria = Categoria.objects.create(
+            edicion=self.edicion,
+            nombre="Acordeonero profesional",
+            activa=True,
+        )
+        self.votacion = Votacion.objects.create(
+            categoria=self.categoria,
+            titulo="Elección de prueba",
+            fecha_apertura=ahora - timedelta(hours=1),
+            fecha_cierre=ahora + timedelta(hours=1),
+            estado=Votacion.Estado.ABIERTA,
+        )
+        self.opcion = Opcion.objects.create(
+            votacion=self.votacion,
+            nombre="Participante habilitado",
+            activa=True,
+        )
+        self.usuario = usuario_model.objects.create_user(
+            username="votante_flujo",
+            password="ClaveSegura123!",
+        )
+        self.votante = Votante.objects.create(
+            usuario=self.usuario,
+            edicion=self.edicion,
+            documento="88776655",
+            correo="votante@example.com",
+            habilitado=True,
+        )
+        self.url = reverse(
+            "public:emitir_voto",
+            args=[self.votacion.pk],
+        )
+        self.client.force_login(self.usuario)
+
+    def confirmar_voto(self, opcion=None):
+        return self.client.post(
+            self.url,
+            {
+                "opcion": (opcion or self.opcion).pk,
+                "confirmar": "1",
+            },
+        )
+
+    def test_registra_voto_valido_solo_despues_de_confirmacion_post(self):
+        seleccion = self.client.post(
+            self.url,
+            {"opcion": self.opcion.pk},
+        )
+
+        self.assertEqual(seleccion.status_code, 200)
+        self.assertContains(seleccion, "Confirma tu elección")
+        self.assertContains(seleccion, "csrfmiddlewaretoken")
+        self.assertEqual(Voto.objects.count(), 0)
+
+        respuesta = self.client.post(
+            self.url,
+            {
+                "opcion": self.opcion.pk,
+                "confirmar": "1",
+                "usuario": "99999",
+                "categoria": "99999",
+                "edicion": "99999",
+            },
+        )
+
+        voto = Voto.objects.get()
+        self.assertRedirects(
+            respuesta,
+            reverse("public:comprobante_voto", args=[voto.pk]),
+        )
+        self.assertEqual(voto.usuario, self.usuario)
+        self.assertEqual(voto.edicion, self.edicion)
+        self.assertEqual(voto.categoria, self.categoria)
+        self.assertEqual(voto.votacion, self.votacion)
+        self.assertEqual(voto.opcion, self.opcion)
+        comprobante = self.client.get(
+            reverse("public:comprobante_voto", args=[voto.pk])
+        )
+        self.assertContains(comprobante, "VF-1")
+        self.assertContains(comprobante, self.votacion.titulo)
+
+    def test_vote_requires_authenticated_user(self):
+        self.client.logout()
+
+        response = self.client.post(
+            self.url,
+            {"opcion": self.opcion.pk},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("public:login"), response.url)
+        self.assertIn("next=", response.url)
+        self.assertEqual(Voto.objects.count(), 0)
+
+    def test_voter_login_returns_to_requested_voting_flow(self):
+        self.client.logout()
+
+        response = self.client.post(
+            f"{reverse('public:login')}?next={self.url}",
+            {
+                "rol": "votante",
+                "documento": self.votante.documento,
+                "correo": self.votante.correo,
+                "acepta_datos": "on",
+                "next": self.url,
+            },
+        )
+
+        self.assertRedirects(response, self.url)
+        self.assertEqual(
+            str(self.client.session["_auth_user_id"]),
+            str(self.usuario.pk),
+        )
+
+    def test_staff_user_cannot_vote(self):
+        admin = get_user_model().objects.create_user(
+            username="admin_vote",
+            password="ClaveSegura123!",
+            is_staff=True,
+        )
+        self.client.force_login(admin)
+
+        response = self.client.post(
+            self.url,
+            {"opcion": self.opcion.pk},
+        )
+
+        self.assertRedirects(response, reverse("public:votaciones"))
+        self.assertEqual(Voto.objects.count(), 0)
+
+    def test_user_not_in_voter_roster_cannot_vote(self):
+        self.votante.delete()
+
+        response = self.client.post(
+            self.url,
+            {"opcion": self.opcion.pk},
+        )
+
+        self.assertRedirects(response, reverse("public:votaciones"))
+        self.assertEqual(Voto.objects.count(), 0)
+
+    def test_duplicate_vote_is_rejected(self):
+        Voto.objects.create(
+            usuario=self.usuario,
+            edicion=self.edicion,
+            categoria=self.categoria,
+            votacion=self.votacion,
+            opcion=self.opcion,
+        )
+
+        response = self.confirmar_voto()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Ya registraste un voto en esta categoría.")
+        self.assertEqual(Voto.objects.count(), 1)
+
+    def test_closed_votation_rejects_selection_and_confirmation(self):
+        self.votacion.estado = Votacion.Estado.CERRADA
+        self.votacion.save()
+
+        response = self.confirmar_voto()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Esta votación no está abierta.")
+        self.assertEqual(Voto.objects.count(), 0)
+
+    def test_inactive_category_or_edition_rejects_vote(self):
+        self.categoria.activa = False
+        self.categoria.save()
+
+        response = self.confirmar_voto()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            "La categoría o edición no está habilitada para votar.",
+        )
+        self.assertEqual(Voto.objects.count(), 0)
+
+    def test_inactive_edition_rejects_vote(self):
+        self.edicion.activa = False
+        self.edicion.save()
+
+        response = self.confirmar_voto()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            "La categoría o edición no está habilitada para votar.",
+        )
+        self.assertEqual(Voto.objects.count(), 0)
+
+    def test_option_from_another_votation_is_rejected(self):
+        otra_categoria = Categoria.objects.create(
+            edicion=self.edicion,
+            nombre="Otra categoría",
+            activa=True,
+        )
+        otra_votacion = Votacion.objects.create(
+            categoria=otra_categoria,
+            titulo="Otra elección",
+            fecha_apertura=timezone.now() - timedelta(hours=1),
+            fecha_cierre=timezone.now() + timedelta(hours=1),
+            estado=Votacion.Estado.ABIERTA,
+        )
+        opcion_ajena = Opcion.objects.create(
+            votacion=otra_votacion,
+            nombre="Opción de otra categoría",
+            activa=True,
+        )
+
+        response = self.confirmar_voto(opcion_ajena)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            "La opción seleccionada no pertenece a esta votación o no está activa.",
+        )
+        self.assertEqual(Voto.objects.count(), 0)
+
+    def test_inactive_option_is_rejected(self):
+        self.opcion.activa = False
+        self.opcion.save()
+
+        response = self.confirmar_voto()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            "La opción seleccionada no pertenece a esta votación o no está activa.",
+        )
+        self.assertEqual(Voto.objects.count(), 0)
+
+    def test_get_does_not_create_vote_and_post_requires_csrf(self):
+        get_response = self.client.get(self.url)
+        self.assertEqual(get_response.status_code, 200)
+        self.assertEqual(Voto.objects.count(), 0)
+
+        csrf_client = Client(enforce_csrf_checks=True)
+        csrf_client.force_login(self.usuario)
+        post_response = csrf_client.post(
+            self.url,
+            {"opcion": self.opcion.pk},
+        )
+        self.assertEqual(post_response.status_code, 403)
+        self.assertEqual(Voto.objects.count(), 0)
+
+    def test_participation_history_only_displays_own_votes(self):
+        Voto.objects.create(
+            usuario=self.usuario,
+            edicion=self.edicion,
+            categoria=self.categoria,
+            votacion=self.votacion,
+            opcion=self.opcion,
+        )
+        otro_usuario = get_user_model().objects.create_user(
+            username="otro_votante",
+            password="ClaveSegura123!",
+        )
+        otra_categoria = Categoria.objects.create(
+            edicion=self.edicion,
+            nombre="Otra categoría",
+            activa=True,
+        )
+        otra_votacion = Votacion.objects.create(
+            categoria=otra_categoria,
+            titulo="Elección ajena",
+            fecha_apertura=timezone.now() - timedelta(hours=1),
+            fecha_cierre=timezone.now() + timedelta(hours=1),
+            estado=Votacion.Estado.ABIERTA,
+        )
+        otra_opcion = Opcion.objects.create(
+            votacion=otra_votacion,
+            nombre="Opción ajena",
+        )
+        Voto.objects.create(
+            usuario=otro_usuario,
+            edicion=self.edicion,
+            categoria=otra_categoria,
+            votacion=otra_votacion,
+            opcion=otra_opcion,
+        )
+
+        response = self.client.get(reverse("public:categorias_votadas"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.categoria.nombre)
+        self.assertNotContains(response, otra_categoria.nombre)

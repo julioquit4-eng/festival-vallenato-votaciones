@@ -178,7 +178,7 @@
       </div>
     </div>
 
-    <div class="row g-4" id="featuredVotes" aria-live="polite">
+    <div class="row g-4" id="featuredVotes" data-source="database" aria-live="polite">
       {% for votacion in votaciones_destacadas %}
         <div class="col-md-6 col-lg-4">{% include "partials/public_vote_card.html" %}</div>
       {% empty %}
@@ -203,8 +203,8 @@
     <div class="row g-5 align-items-center">
       <div class="col-lg-4">
         <span class="vf-eyebrow vf-eyebrow--light">Proceso de votación</span>
-        <h2 class="section__title" id="pasosTitle">Consulta pública y participación pendiente</h2>
-        <p class="section__lead">Por ahora puedes consultar las votaciones y sus opciones. La validación del padrón y el registro de votos aún no están habilitados.</p>
+        <h2 class="section__title" id="pasosTitle">Consulta y participa</h2>
+        <p class="section__lead">Inicia sesión con los datos del padrón habilitado, selecciona una opción y confirma tu voto dentro del periodo autorizado.</p>
         <a class="btn btn-vf-gold mt-2" href="{% url 'public:guia' %}">Ver información del proceso</a>
       </div>
       <div class="col-lg-8">
@@ -230,7 +230,7 @@
               <span class="step-card__num" aria-hidden="true">03</span>
               <span class="vf-icon-circle"><i class="bi bi-patch-check" aria-hidden="true"></i></span>
               <h3>Participación pendiente</h3>
-              <p>La validación de votantes y la emisión del voto se habilitarán en una etapa posterior.</p>
+              <p>Confirma tu elección para registrar un voto único en la categoría.</p>
             </article>
           </div>
         </div>

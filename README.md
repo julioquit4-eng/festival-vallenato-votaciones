@@ -64,10 +64,16 @@ La cuenta creada con `createsuperuser` puede iniciar sesión en `/login/` y
 acceder al panel administrativo. Las rutas del panel requieren una cuenta con
 permisos de personal (`is_staff`).
 
-La página pública de votaciones obtiene ediciones, categorías, votaciones y
-opciones de MySQL. La autenticación de votantes y el registro/publicación de
-votos siguen pendientes porque aún no existe un padrón ni un modelo de
-sufragios. No se cargan datos de prueba.
+La página pública obtiene ediciones, categorías, votaciones y opciones de
+MySQL. Para votar, la persona debe iniciar sesión con su documento y correo
+registrados en el padrón habilitado de la edición activa. El sistema permite
+seleccionar una opción activa y requiere una confirmación explícita antes de
+registrar el voto. La cuenta, edición y categoría se determinan en el servidor;
+cada votante solo puede registrar un voto por categoría y edición.
+
+El comprobante y el historial de participación están disponibles para la
+persona autenticada. El administrador puede cargar el padrón desde el panel;
+no se crean votantes ni votos de prueba automáticamente.
 
 Desde el panel también se pueden crear, editar y eliminar votaciones y sus
 opciones. Para proteger la integridad del proceso, una votación abierta y sus

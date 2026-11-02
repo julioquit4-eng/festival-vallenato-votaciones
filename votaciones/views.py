@@ -4,25 +4,29 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
+from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_http_methods, require_POST
 
 from .forms import (
     AccesoVotanteForm,
     CategoriaForm,
     CensoUploadForm,
+    ConfirmarVotoForm,
     EdicionForm,
     OpcionForm,
+    VotoForm,
     VotacionForm,
 )
-from .models import Categoria, Edicion, Opcion, Votacion, Votante
+from .models import Categoria, Edicion, Opcion, Votacion, Votante, Voto
 
 
 def _votaciones_publicas():
@@ -98,10 +102,192 @@ def detalle_votacion(request):
     _actualizar_estado_publico(votacion, timezone.now())
 
     opciones = votacion.opciones.filter(activa=True)
+    voto_url = reverse("public:emitir_voto", args=[votacion.pk])
+    puede_votar = (
+        request.user.is_authenticated
+        and not request.user.is_staff
+        and Votante.objects.filter(
+            usuario=request.user,
+            edicion=votacion.categoria.edicion,
+            habilitado=True,
+        ).exists()
+    )
     return render(
         request,
         "public/detalle_votacion.html",
-        {"votacion": votacion, "opciones": opciones},
+        {
+            "votacion": votacion,
+            "opciones": opciones,
+            "voto_form": VotoForm(votacion),
+            "voto_url": voto_url,
+            "puede_votar": puede_votar,
+            "votacion_habilitada": (
+                votacion.esta_abierta
+                and votacion.categoria.activa
+                and votacion.categoria.edicion.activa
+            ),
+            "login_url": f"{reverse('public:login')}?next={voto_url}",
+            "ya_voto": (
+                request.user.is_authenticated
+                and Voto.objects.filter(
+                    usuario=request.user,
+                    categoria=votacion.categoria,
+                    edicion=votacion.categoria.edicion,
+                ).exists()
+            ),
+        },
+    )
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def emitir_voto(request, votacion_id):
+    votacion = get_object_or_404(
+        Votacion.objects.select_related("categoria", "categoria__edicion"),
+        pk=votacion_id,
+    )
+    esta_en_padron = Votante.objects.filter(
+        usuario=request.user,
+        edicion=votacion.categoria.edicion,
+        habilitado=True,
+    ).exists()
+    if request.user.is_staff or not esta_en_padron:
+        messages.error(
+            request,
+            "Solo un votante habilitado en el padrón de esta edición puede votar.",
+        )
+        return redirect("public:votaciones")
+
+    votacion.estado_publico = (
+        "abierta" if votacion.esta_abierta else "cerrada"
+    )
+    votar_url = reverse("public:emitir_voto", args=[votacion.pk])
+    opciones = votacion.opciones.filter(activa=True)
+    ya_voto = Voto.objects.filter(
+        usuario=request.user,
+        categoria=votacion.categoria,
+        edicion=votacion.categoria.edicion,
+    ).exists()
+
+    if request.method == "GET":
+        form = VotoForm(votacion)
+        if not votacion.esta_abierta:
+            messages.error(request, "Esta votación no está abierta.")
+        elif not votacion.categoria.activa or not votacion.categoria.edicion.activa:
+            messages.error(
+                request,
+                "La categoría o edición no está habilitada para votar.",
+            )
+        elif ya_voto:
+            messages.error(request, "Ya registraste un voto en esta categoría.")
+        return render(
+            request,
+            "public/detalle_votacion.html",
+            {
+                "votacion": votacion,
+                "opciones": opciones,
+                "voto_form": form,
+                "voto_url": votar_url,
+                "puede_votar": True,
+                "votacion_habilitada": (
+                    votacion.esta_abierta
+                    and votacion.categoria.activa
+                    and votacion.categoria.edicion.activa
+                ),
+                "ya_voto": ya_voto,
+            },
+        )
+
+    if not votacion.esta_abierta:
+        messages.error(request, "Esta votación no está abierta.")
+    elif not votacion.categoria.activa or not votacion.categoria.edicion.activa:
+        messages.error(
+            request,
+            "La categoría o edición no está habilitada para votar.",
+        )
+    elif ya_voto:
+        messages.error(request, "Ya registraste un voto en esta categoría.")
+    else:
+        confirmation = request.POST.get("confirmar") == "1"
+        form_class = ConfirmarVotoForm if confirmation else VotoForm
+        form = form_class(votacion, request.POST)
+
+        if form.is_valid():
+            opcion = form.cleaned_data["opcion"]
+            if not confirmation:
+                return render(
+                    request,
+                    "public/confirmar_voto.html",
+                    {
+                        "votacion": votacion,
+                        "opcion": opcion,
+                        "voto_url": votar_url,
+                    },
+                )
+
+            try:
+                with transaction.atomic():
+                    voto = Voto.objects.create(
+                        usuario=request.user,
+                        edicion=opcion.votacion.categoria.edicion,
+                        categoria=opcion.votacion.categoria,
+                        votacion=opcion.votacion,
+                        opcion=opcion,
+                    )
+            except IntegrityError:
+                if Voto.objects.filter(
+                    usuario=request.user,
+                    categoria=votacion.categoria,
+                    edicion=votacion.categoria.edicion,
+                ).exists():
+                    messages.error(
+                        request,
+                        "Ya registraste un voto en esta categoría.",
+                    )
+                else:
+                    raise
+            except ValidationError:
+                if Voto.objects.filter(
+                    usuario=request.user,
+                    categoria=votacion.categoria,
+                    edicion=votacion.categoria.edicion,
+                ).exists():
+                    messages.error(
+                        request,
+                        "Ya registraste un voto en esta categoría.",
+                    )
+                else:
+                    messages.error(
+                        request,
+                        "No fue posible validar la opción seleccionada.",
+                    )
+            else:
+                messages.success(request, "Tu voto se registró correctamente.")
+                return redirect(
+                    "public:comprobante_voto",
+                    voto_id=voto.pk,
+                )
+        else:
+            for error in form.errors.get("opcion", []):
+                messages.error(request, error)
+
+    form = VotoForm(votacion, request.POST)
+    return render(
+        request,
+        "public/detalle_votacion.html",
+        {
+            "votacion": votacion,
+            "opciones": opciones,
+            "voto_form": form,
+            "voto_url": votar_url,
+            "puede_votar": True,
+            "votacion_habilitada": (
+                votacion.esta_abierta
+                and votacion.categoria.activa
+                and votacion.categoria.edicion.activa
+            ),
+            "ya_voto": ya_voto,
+        },
     )
 
 
@@ -110,11 +296,35 @@ def acceso_votante(request):
 
 
 def confirmar_voto(request):
-    return render(request, "public/confirmar_voto.html")
+    return redirect("public:votaciones")
 
 
 def comprobante(request):
-    return render(request, "public/comprobante.html")
+    return redirect("public:votaciones")
+
+
+@login_required
+def comprobante_voto(request, voto_id):
+    voto = get_object_or_404(
+        Voto.objects.select_related("categoria", "categoria__edicion", "votacion"),
+        pk=voto_id,
+        usuario=request.user,
+    )
+    return render(request, "public/comprobante.html", {"voto": voto})
+
+
+@login_required
+def categorias_votadas(request):
+    votos = Voto.objects.filter(usuario=request.user).select_related(
+        "categoria",
+        "categoria__edicion",
+        "votacion",
+    )
+    return render(
+        request,
+        "public/categorias_votadas.html",
+        {"votos": votos},
+    )
 
 
 def resultados(request):
@@ -221,6 +431,12 @@ def login(request):
                             usuario,
                             backend="django.contrib.auth.backends.ModelBackend",
                         )
+                        if next_url and url_has_allowed_host_and_scheme(
+                            next_url,
+                            allowed_hosts={request.get_host()},
+                            require_https=request.is_secure(),
+                        ):
+                            return redirect(next_url)
                         return redirect("public:votaciones")
 
     return render(

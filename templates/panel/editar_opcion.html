@@ -1,0 +1,39 @@
+{% extends "panel/base_panel.html" %}
+
+{% block title %}Editar opción{% endblock %}
+{% block header_title %}Editar candidato u opción{% endblock %}
+{% block page_id %}opciones{% endblock %}
+{% block nav_section %}opciones{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'panel:opciones' %}">Opciones y candidatos</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ opcion.nombre }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="panel-card">
+  <div class="panel-card__head"><h2>{{ opcion.nombre }}</h2></div>
+  <div class="panel-card__body">
+    <form method="post">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      <div class="row g-3">
+        {% for field in form %}
+          <div class="{% if field.name == 'descripcion' %}col-12{% else %}col-md-6{% endif %}">
+            {% if field.field.widget.input_type == "checkbox" %}
+              <div class="form-check form-switch mt-4">{{ field }}{{ field.label_tag }}</div>
+            {% else %}
+              {{ field.label_tag }}{{ field }}
+            {% endif %}
+            {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+      <div class="d-flex justify-content-end gap-2 mt-3">
+        <a class="btn btn-vf-outline" href="{% url 'panel:opciones' %}">Cancelar</a>
+        <button type="submit" class="btn btn-vf">Guardar cambios</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

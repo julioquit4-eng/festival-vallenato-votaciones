@@ -1,129 +1,28 @@
 {% extends "public/base_public.html" %}
-{% load static %}
 
-{% block title %}Validación de identidad{% endblock %}
+{% block title %}Acceso de votantes{% endblock %}
 {% block page_id %}acceso_votante{% endblock %}
 {% block nav_section %}votaciones{% endblock %}
 
 {% block content %}
 <div class="auth-shell">
-  <!-- Lateral decorativo con contexto del festival -->
   <aside class="auth-aside">
-    <img src="{% static 'img/instrumentos.jpg' %}" alt="Instrumentos tradicionales de vallenato" loading="lazy">
     <div class="position-relative z-1">
-      <span class="vf-eyebrow vf-eyebrow--light">Festival de la Leyenda Vallenata 2027</span>
-      <h2 class="mt-2 text-white">Tu voto es un homenaje a nuestra tradición</h2>
-      <p class="text-white-50">Para garantizar la integridad y transparencia del certamen, cada votante debe encontrarse habilitado en el padrón electoral oficial.</p>
-      <div class="d-flex align-items-center gap-2 mt-4 text-white small">
-        <i class="bi bi-shield-check text-gold fs-5"></i>
-        <span>Proceso cifrado y tratamiento conforme a la ley de protección de datos personales.</span>
-      </div>
+      <span class="vf-eyebrow vf-eyebrow--light">Festival de la Leyenda Vallenata</span>
+      <h1 class="mt-2 text-white">Participación de votantes</h1>
+      <p class="text-white-50">El acceso estará disponible cuando se encuentre configurado el padrón oficial.</p>
     </div>
   </aside>
 
-  <!-- Formulario de validación del votante -->
-  <section class="auth-main" aria-labelledby="authTitle">
+  <section class="auth-main" aria-labelledby="voterAccessTitle">
     <div class="auth-card">
-      <!-- Stepper -->
-      <ol class="vf-stepper mb-4" aria-label="Progreso de votación">
-        <li class="is-done">
-          <span class="dot"><i class="bi bi-check"></i></span>
-          <span class="d-none d-sm-inline">Opción</span>
-        </li>
-        <li class="is-current" aria-current="step">
-          <span class="dot">2</span>
-          <span>Validación</span>
-        </li>
-        <li>
-          <span class="dot">3</span>
-          <span class="d-none d-sm-inline">Confirmación</span>
-        </li>
-        <li>
-          <span class="dot">4</span>
-          <span class="d-none d-sm-inline">Comprobante</span>
-        </li>
-      </ol>
-
-      <div class="mb-4">
-        <div class="d-flex justify-content-between align-items-center mb-1">
-          <span class="vf-eyebrow">Paso 2 de 4</span>
-          <span class="vf-demo-tag"><i class="bi bi-cone-striped"></i>Simulado</span>
-        </div>
-        <h1 class="h2" id="authTitle">Valida tu identidad</h1>
-        <p class="text-muted small">Ingresa el número de documento y el correo con los que fuiste registrado en el padrón del Festival.</p>
+      <span class="vf-icon-circle vf-icon-circle--night mb-3"><i class="bi bi-person-vcard"></i></span>
+      <h2 class="h3" id="voterAccessTitle">Validación pendiente</h2>
+      <p class="text-muted">Todavía no se ha configurado el padrón de votantes. No solicitaremos ni validaremos documentos hasta que ese flujo esté implementado.</p>
+      <div class="d-grid gap-2">
+        <a href="{% url 'public:votaciones' %}" class="btn btn-vf-outline">Consultar votaciones</a>
+        <a href="{% url 'public:inicio' %}" class="btn btn-link-vf">Volver al inicio</a>
       </div>
-
-      <!-- Resumen de opción previamente seleccionada -->
-      <div class="p-3 mb-4 rounded-3 bg-light border border-secondary-subtle d-flex align-items-center justify-content-between" id="authVoteSummaryBox">
-        <div>
-          <small class="text-muted d-block text-uppercase fw-bold" style="font-size:0.68rem;">Votación seleccionada</small>
-          <strong id="authVoteTitleSummary" class="text-dark">Acordeonero Profesional</strong>
-          <span class="d-block small text-muted" id="authCandidateSummary">Opción seleccionada</span>
-        </div>
-        <a href="{% url 'public:votaciones' %}" class="btn btn-sm btn-link-vf text-decoration-none">Cambiar</a>
-      </div>
-
-      <div class="vf-alert vf-alert--info mb-4">
-        <i class="bi bi-shield-check"></i>
-        <div class="small">
-          <strong>Seguridad Electoral:</strong> Tu identidad se verifica en el censo oficial del Festival bajo estrictos protocolos de Habeas Data y voto secreto.
-        </div>
-      </div>
-
-      <form id="voterLoginForm" novalidate>
-        <!-- Número de documento -->
-        <div class="mb-3">
-          <label for="cedulaInput" class="form-label">Número de cédula o documento <span class="req">*</span></label>
-          <div class="vf-input-icon">
-            <i class="bi bi-person-vcard"></i>
-            <input type="text" 
-                   class="form-control" 
-                   id="cedulaInput" 
-                   name="cedula" 
-                   placeholder="Ej: 1065123456" 
-                   required 
-                   pattern="[0-9]{6,12}" 
-                   data-msg-required="Ingresa tu número de documento." 
-                   data-msg-pattern="Ingresa un número de documento válido (entre 6 y 12 dígitos sin puntos ni espacios).">
-          </div>
-          <div class="form-text">Solo dígitos, sin puntos, espacios ni guiones.</div>
-        </div>
-
-        <!-- Correo electrónico -->
-        <div class="mb-4">
-          <label for="correoInput" class="form-label">Correo electrónico registrado <span class="req">*</span></label>
-          <div class="vf-input-icon">
-            <i class="bi bi-envelope"></i>
-            <input type="email" 
-                   class="form-control" 
-                   id="correoInput" 
-                   name="correo" 
-                   placeholder="nombre@ejemplo.com" 
-                   required 
-                   data-msg-required="Ingresa tu correo electrónico." 
-                   data-msg-type="Ingresa un formato de correo válido (ej: usuario@dominio.com).">
-          </div>
-          <div class="form-text">Enviaremos el comprobante digital una vez finalizado el proceso.</div>
-        </div>
-
-        <!-- Aceptación de política de tratamiento de datos -->
-        <div class="form-check mb-4">
-          <input class="form-check-input" type="checkbox" id="habeasDataCheck" name="habeas_data" required data-msg-required="Debes autorizar el tratamiento de datos para continuar.">
-          <label class="form-check-label small" for="habeasDataCheck">
-            Autorizo el tratamiento de mis datos personales con fines de validación electoral conforme a la <a href="{% url 'public:privacidad' %}" target="_blank">política de privacidad</a>. <span class="req">*</span>
-          </label>
-        </div>
-
-        <!-- Botones de acción -->
-        <div class="d-grid gap-2">
-          <button type="submit" class="btn btn-vf btn-lg" id="btnValidateVoter">
-            Validar y continuar <i class="bi bi-arrow-right"></i>
-          </button>
-          <a href="{% url 'public:votaciones' %}" class="btn btn-vf-outline">
-            Cancelar y volver
-          </a>
-        </div>
-      </form>
     </div>
   </section>
 </div>

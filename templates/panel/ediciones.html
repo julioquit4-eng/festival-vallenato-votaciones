@@ -12,14 +12,10 @@
 
 {% block content %}
 <div class="row g-4">
-  <!-- Columna Ediciones -->
   <div class="col-lg-6">
     <div class="panel-card mb-4">
       <div class="panel-card__head">
         <h2><i class="bi bi-calendar-event me-2"></i> Ediciones Registradas</h2>
-        <button type="button" class="btn btn-sm btn-vf" id="btnOpenNewEditionModal">
-          <i class="bi bi-plus-lg"></i> Nueva Edición
-        </button>
       </div>
       <div class="table-responsive">
         <table class="table table-hover align-middle mb-0" id="editionsTable">
@@ -27,37 +23,83 @@
             <tr>
               <th>Nombre / Año</th>
               <th>Estado</th>
+              <th>Fechas</th>
               <th class="text-end">Acciones</th>
             </tr>
           </thead>
-          <tbody>
-            <!-- Render dinámico -->
+          <tbody data-source="database">
+            {% for edicion in ediciones %}
+              <tr>
+                <td>
+                  <strong>{{ edicion.nombre }}</strong><br>
+                  <small class="text-muted">{{ edicion.anio }}</small>
+                </td>
+                <td>
+                  {% if edicion.activa %}
+                    <span class="vf-status vf-status--activa"><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Activa</span>
+                  {% else %}
+                    <span class="vf-status vf-status--inactiva"><i class="bi bi-dash-circle" aria-hidden="true"></i>Inactiva</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <small class="text-muted">{{ edicion.fecha_inicio|date:"d/m/Y" }} - {{ edicion.fecha_fin|date:"d/m/Y" }}</small>
+                </td>
+                <td class="text-end">
+                  {% if not edicion.total_categorias and not edicion.total_votantes %}
+                    <form method="post" action="{% url 'panel:eliminar_edicion' edicion.pk %}" onsubmit="return confirm('¿Eliminar la edición {{ edicion.anio }}? Esta acción no se puede deshacer.');">
+                      {% csrf_token %}
+                      <button class="btn btn-sm btn-outline-danger" type="submit" aria-label="Eliminar edición {{ edicion.anio }}">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </form>
+                  {% else %}
+                    <span class="small text-muted" title="Elimina o reasigna sus categorías y votantes antes de eliminar esta edición.">Tiene registros asociados</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="4" class="text-center py-4 text-muted">No hay ediciones registradas.</td>
+              </tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <!-- Columna Categorías -->
   <div class="col-lg-6">
     <div class="panel-card mb-4">
       <div class="panel-card__head">
         <h2><i class="bi bi-tags me-2"></i> Categorías de Competición</h2>
-        <button type="button" class="btn btn-sm btn-vf" id="btnOpenNewCatModal">
-          <i class="bi bi-plus-lg"></i> Nueva Categoría
-        </button>
       </div>
       <div class="table-responsive">
         <table class="table table-hover align-middle mb-0" id="categoriesTable">
           <thead>
             <tr>
               <th>Categoría</th>
+              <th>Edición</th>
               <th>Estado</th>
-              <th class="text-end">Acciones</th>
             </tr>
           </thead>
           <tbody>
-            <!-- Render dinámico -->
+            {% for categoria in categorias %}
+              <tr>
+                <td><strong>{{ categoria.nombre }}</strong></td>
+                <td><small class="text-muted">{{ categoria.edicion.nombre }} ({{ categoria.edicion.anio }})</small></td>
+                <td>
+                  {% if categoria.activa %}
+                    <span class="vf-status vf-status--activa"><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Activa</span>
+                  {% else %}
+                    <span class="vf-status vf-status--inactiva"><i class="bi bi-dash-circle" aria-hidden="true"></i>Inactiva</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="3" class="text-center py-4 text-muted">No hay categorías registradas.</td>
+              </tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>
@@ -65,83 +107,93 @@
   </div>
 </div>
 
-<!-- Modal Crear/Editar Edición -->
-<div class="modal fade" id="editionModal" tabindex="-1" aria-labelledby="editionModalTitle" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <form id="editionForm" novalidate>
-        <div class="modal-header">
-          <h2 class="modal-title h5" id="editionModalTitle">Registrar Edición del Festival</h2>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
+<div class="row g-4 mt-2">
+  <div class="col-lg-6">
+    <div class="panel-card">
+      <div class="panel-card__head">
+        <h2><i class="bi bi-plus-circle me-2"></i> Nueva Edición</h2>
+      </div>
+      <div class="panel-card__body">
+        <form method="post" action="{% url 'panel:ediciones' %}">
+          {% csrf_token %}
+          {{ edicion_form.non_field_errors }}
           <div class="mb-3">
-            <label for="editionNameInput" class="form-label">Nombre de la edición <span class="req">*</span></label>
-            <input type="text" class="form-control" id="editionNameInput" required placeholder="Ej: Festival de la Leyenda Vallenata 2027">
+            {{ edicion_form.nombre.label_tag }}
+            {{ edicion_form.nombre }}
+            {% for error in edicion_form.nombre.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
           </div>
-          <div class="row g-2 mb-3">
-            <div class="col-6">
-              <label for="editionYearInput" class="form-label">Año <span class="req">*</span></label>
-              <input type="number" class="form-control" id="editionYearInput" required min="2020" max="2035" value="2027">
+          <div class="row g-3">
+            <div class="col-md-6">
+              {{ edicion_form.anio.label_tag }}
+              {{ edicion_form.anio }}
+              {% for error in edicion_form.anio.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
             </div>
-            <div class="col-6">
-              <label for="editionStatusSelect" class="form-label">Estado <span class="req">*</span></label>
-              <select class="form-select" id="editionStatusSelect">
-                <option value="activa">Activa</option>
-                <option value="inactiva">Inactiva</option>
-                <option value="borrador">Borrador</option>
-              </select>
+            <div class="col-md-6">
+              <label class="form-label">Estado</label>
+              <div class="form-check form-switch mt-2">
+                {{ edicion_form.activa }}
+                <label class="form-check-label" for="{{ edicion_form.activa.id_for_label }}">Activa</label>
+              </div>
             </div>
           </div>
-          <div class="mb-3">
-            <label for="editionDescInput" class="form-label">Descripción</label>
-            <textarea class="form-control" id="editionDescInput" rows="2" placeholder="Detalles de la edición..."></textarea>
+          <div class="row g-3 mt-1">
+            <div class="col-md-6">
+              {{ edicion_form.fecha_inicio.label_tag }}
+              {{ edicion_form.fecha_inicio }}
+              {% for error in edicion_form.fecha_inicio.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6">
+              {{ edicion_form.fecha_fin.label_tag }}
+              {{ edicion_form.fecha_fin }}
+              {% for error in edicion_form.fecha_fin.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-vf-outline" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-vf">Guardar edición (Demo)</button>
-        </div>
-      </form>
+          <div class="mt-3">
+            {{ edicion_form.descripcion.label_tag }}
+            {{ edicion_form.descripcion }}
+            {% for error in edicion_form.descripcion.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="d-flex justify-content-end mt-3">
+            <button type="submit" class="btn btn-vf">Guardar edición</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- Modal Crear/Editar Categoría -->
-<div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalTitle" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <form id="categoryForm" novalidate>
-        <div class="modal-header">
-          <h2 class="modal-title h5" id="categoryModalTitle">Nueva Categoría</h2>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
+  <div class="col-lg-6">
+    <div class="panel-card">
+      <div class="panel-card__head">
+        <h2><i class="bi bi-tags-fill me-2"></i> Nueva Categoría</h2>
+      </div>
+      <div class="panel-card__body">
+        <form method="post" action="{% url 'panel:categorias' %}">
+          {% csrf_token %}
+          {{ categoria_form.non_field_errors }}
           <div class="mb-3">
-            <label for="catNameInput" class="form-label">Nombre de categoría <span class="req">*</span></label>
-            <input type="text" class="form-control" id="catNameInput" required placeholder="Ej: Acordeonero Profesional">
+            {{ categoria_form.edicion.label_tag }}
+            {{ categoria_form.edicion }}
+            {% for error in categoria_form.edicion.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
           </div>
           <div class="mb-3">
-            <label for="catEditionSelect" class="form-label">Edición asignada <span class="req">*</span></label>
-            <select class="form-select" id="catEditionSelect">
-              <option value="ed-2027">Festival 2027</option>
-              <option value="ed-2026">Festival 2026</option>
-            </select>
+            {{ categoria_form.nombre.label_tag }}
+            {{ categoria_form.nombre }}
+            {% for error in categoria_form.nombre.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
           </div>
           <div class="mb-3">
-            <label for="catDescInput" class="form-label">Descripción</label>
-            <textarea class="form-control" id="catDescInput" rows="2" placeholder="Criterios y descripción de la categoría..."></textarea>
+            {{ categoria_form.descripcion.label_tag }}
+            {{ categoria_form.descripcion }}
+            {% for error in categoria_form.descripcion.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
           </div>
           <div class="form-check form-switch mb-3">
-            <input class="form-check-input" type="checkbox" id="catActiveCheck" checked>
-            <label class="form-check-label" for="catActiveCheck">Categoría activa para votación</label>
+            {{ categoria_form.activa }}
+            <label class="form-check-label" for="{{ categoria_form.activa.id_for_label }}">Categoría activa</label>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-vf-outline" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-vf">Guardar categoría (Demo)</button>
-        </div>
-      </form>
+          <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-vf">Guardar categoría</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </div>

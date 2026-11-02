@@ -43,7 +43,9 @@
               </div>
             </div>
 
-            <form id="modalVoterLoginForm" novalidate>
+            <form id="modalVoterLoginForm" method="post" action="{% url 'public:login' %}">
+              {% csrf_token %}
+              <input type="hidden" name="rol" value="votante">
               <div class="mb-3">
                 <label for="modalLoginCedula" class="form-label small fw-bold">Número de cédula <span class="req">*</span></label>
                 <div class="vf-input-icon">
@@ -51,7 +53,7 @@
                   <input type="text" 
                          class="form-control" 
                          id="modalLoginCedula" 
-                         name="cedula" 
+                         name="documento"
                          placeholder="Ej. 1.065.123.456" 
                          required 
                          pattern="[0-9]{6,12}" 
@@ -76,7 +78,7 @@
               </div>
 
               <div class="form-check mb-3">
-                <input class="form-check-input" type="checkbox" id="modalLoginHabeas" name="habeas_data" required data-msg-required="Debes aceptar el tratamiento de datos.">
+                <input class="form-check-input" type="checkbox" id="modalLoginHabeas" name="acepta_datos" required data-msg-required="Debes aceptar el tratamiento de datos.">
                 <label class="form-check-label small text-muted" for="modalLoginHabeas" style="font-size: 0.78rem;">
                   Acepto el <a href="{% url 'public:privacidad' %}" target="_blank">tratamiento de datos y voto secreto</a>. <span class="req">*</span>
                 </label>
@@ -99,7 +101,9 @@
               </div>
             </div>
 
-            <form id="modalAdminLoginForm" novalidate>
+            <form id="modalAdminLoginForm" method="post" action="{% url 'public:login' %}">
+              {% csrf_token %}
+              <input type="hidden" name="rol" value="administrador">
               <div class="mb-3">
                 <label for="modalAdminUser" class="form-label small fw-bold">Usuario administrativo <span class="req">*</span></label>
                 <div class="vf-input-icon">
@@ -135,7 +139,7 @@
 
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="modalRememberAdmin">
+                  <input class="form-check-input" type="checkbox" id="modalRememberAdmin" name="recordar_sesion" value="1">
                   <label class="form-check-label small text-muted" for="modalRememberAdmin" style="font-size: 0.78rem;">Recordar sesión</label>
                 </div>
                 <a href="#" class="small text-muted text-decoration-none" style="font-size: 0.78rem;" data-not-implemented="Contacta a la comisión técnica del certamen para restablecer tus credenciales.">¿Olvidaste tu clave?</a>
@@ -149,7 +153,7 @@
 
               <div class="mt-3 p-2 rounded bg-light border text-center">
                 <small class="text-muted" style="font-size:0.72rem;">
-                  <i class="bi bi-info-circle me-1"></i><strong>Acceso rápido:</strong> usuario <code>admin</code> / cualquier clave.
+                  <i class="bi bi-info-circle me-1"></i>Usa la contraseña válida de tu cuenta administrativa.
                 </small>
               </div>
             </form>

@@ -1486,3 +1486,65 @@ class FlujoRegistroVotoTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.categoria.nombre)
         self.assertNotContains(response, otra_categoria.nombre)
+
+
+class ApiCategoriasTests(TestCase):
+    def setUp(self):
+        hoy = timezone.localdate()
+        ahora = timezone.now()
+
+        self.edicion = Edicion.objects.create(
+            nombre="Festival API",
+            anio=2030,
+            fecha_inicio=hoy,
+            fecha_fin=hoy + timedelta(days=5),
+            activa=True,
+        )
+
+        self.categoria = Categoria.objects.create(
+            edicion=self.edicion,
+            nombre="Categoria API",
+            activa=True,
+        )
+
+        self.votacion = Votacion.objects.create(
+            categoria=self.categoria,
+            titulo="Votacion API",
+            fecha_apertura=ahora - timedelta(hours=1),
+            fecha_cierre=ahora + timedelta(hours=1),
+            estado=Votacion.Estado.ABIERTA,
+        )
+
+        self.opcion = Opcion.objects.create(
+            votacion=self.votacion,
+            nombre="Opcion API",
+            activa=True,
+            orden=1,
+        )
+
+    def test_api_categorias_responde_200(self):
+        response = self.client.get("/api/categorias/")
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_api_categorias_retorna_json(self):
+        response = self.client.get("/api/categorias/")
+
+        self.assertEqual(
+            response["Content-Type"],
+            "application/json",
+        )
+
+    def test_api_categorias_incluye_categorias_y_opciones(self):
+        response = self.client.get("/api/categorias/")
+        data = response.json()
+
+        self.assertEqual(len(data), 1)
+        self.assertEqual(
+            data[0]["categorias"][0]["nombre"],
+            "Categoria API",
+        )
+        self.assertEqual(
+            data[0]["categorias"][0]["votaciones"][0]["opciones"][0]["nombre"],
+            "Opcion API",
+        )

@@ -1,3 +1,5 @@
+import csv
+from io import StringIO
 from uuid import uuid4
 
 from django.contrib import messages
@@ -10,6 +12,7 @@ from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.db import IntegrityError, transaction
 from django.db.models import Count
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -885,4 +888,99 @@ def _enmascarar_correo(correo):
 
 @staff_member_required(login_url="public:login")
 def panel_reportes(request):
-    return render(request, "panel/reportes.html")
+    estados_reportables = (
+        Votacion.Estado.ABIERTA,
+        Votacion.Estado.CERRADA,
+    )
+    votaciones = list(
+        Votacion.objects.select_related("categoria", "categoria__edicion")
+        .filter(estado__in=estados_reportables)
+        .order_by("-fecha_cierre")
+    )
+    selected_id = request.GET.get("votacion")
+    votacion = None
+
+    if selected_id:
+        votacion = next(
+            (item for item in votaciones if str(item.pk) == selected_id),
+            None,
+        )
+        if votacion is None:
+            raise Http404(
+                "La votación solicitada no existe o no está abierta ni cerrada."
+            )
+    elif votaciones:
+        votacion = votaciones[0]
+
+    census = 0
+    total_votes = 0
+    results = []
+    participation_pct = 0
+
+    if votacion:
+        census = Votante.objects.filter(
+            edicion_id=votacion.categoria.edicion_id,
+            habilitado=True,
+        ).count()
+        results = list(
+            votacion.opciones.annotate(total_votos=Count("votos")).order_by(
+                "-total_votos", "orden", "nombre"
+            )
+        )
+        total_votes = sum(opcion.total_votos for opcion in results)
+        participation_pct = total_votes / census * 100 if census else 0
+        for opcion in results:
+            opcion.porcentaje = (
+                opcion.total_votos / total_votes * 100 if total_votes else 0
+            )
+
+    if request.GET.get("export") == "csv":
+        if votacion is None:
+            raise Http404("No hay una votación abierta o cerrada para exportar.")
+
+        output = StringIO()
+        csv_writer = csv.writer(output)
+        csv_writer.writerow(
+            ["Posición", "Candidato u opción", "Votos obtenidos", "Porcentaje"]
+        )
+        for position, opcion in enumerate(results, start=1):
+            csv_writer.writerow(
+                [
+                    position,
+                    opcion.nombre,
+                    opcion.total_votos,
+                    f"{opcion.porcentaje:.2f}%",
+                ]
+            )
+        csv_writer.writerow([])
+        csv_writer.writerow(["Proceso", votacion.titulo])
+        csv_writer.writerow(["Estado", votacion.get_estado_display()])
+        csv_writer.writerow(["Censo electoral habilitado", census])
+        csv_writer.writerow(["Votos válidos emitidos", total_votes])
+        csv_writer.writerow(["Participación", f"{participation_pct:.2f}%"])
+
+        response = HttpResponse(
+            output.getvalue(),
+            content_type="text/csv; charset=utf-8",
+        )
+        response["Content-Disposition"] = (
+            f'attachment; filename="reporte_votacion_{votacion.pk}.csv"'
+        )
+        return response
+
+    return render(
+        request,
+        "panel/reportes.html",
+        {
+            "votaciones": votaciones,
+            "votacion_seleccionada": votacion,
+            "resultados_parciales": (
+                votacion is not None
+                and votacion.estado == Votacion.Estado.ABIERTA
+            ),
+            "censo": census,
+            "total_votos": total_votes,
+            "participacion_pct": participation_pct,
+            "resultados": results,
+        },
+    )

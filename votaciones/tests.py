@@ -289,6 +289,167 @@ class AdminAuthenticationTests(TestCase):
         self.assertEqual(voter_response.status_code, 403)
 
 
+class ReportesAdministrativosTests(TestCase):
+    def setUp(self):
+        usuario_model = get_user_model()
+        hoy = timezone.localdate()
+        ahora = timezone.now()
+        self.admin = usuario_model.objects.create_user(
+            username="report_admin",
+            is_staff=True,
+        )
+        self.edicion = Edicion.objects.create(
+            nombre="Festival para reportes",
+            anio=2099,
+            fecha_inicio=hoy,
+            fecha_fin=hoy + timedelta(days=3),
+            activa=True,
+        )
+        self.categoria = Categoria.objects.create(
+            edicion=self.edicion,
+            nombre="Categoría de reportes",
+        )
+        self.votacion = Votacion.objects.create(
+            categoria=self.categoria,
+            titulo="Proceso cerrado",
+            fecha_apertura=ahora - timedelta(days=2),
+            fecha_cierre=ahora - timedelta(days=1),
+            estado=Votacion.Estado.CERRADA,
+        )
+        self.opcion_uno = Opcion.objects.create(
+            votacion=self.votacion,
+            nombre="Candidato uno",
+            orden=1,
+        )
+        self.opcion_dos = Opcion.objects.create(
+            votacion=self.votacion,
+            nombre="Candidato dos",
+            orden=2,
+        )
+        self.client.force_login(self.admin)
+
+    def crear_voto(self, username, opcion):
+        usuario = get_user_model().objects.create_user(
+            username=username,
+        )
+        return Voto.objects.create(
+            usuario=usuario,
+            edicion=self.edicion,
+            categoria=self.categoria,
+            votacion=self.votacion,
+            opcion=opcion,
+        )
+
+    def test_report_displays_real_census_and_tally(self):
+        Votante.objects.create(
+            edicion=self.edicion,
+            documento="10001",
+            correo="uno@example.com",
+            habilitado=True,
+        )
+        Votante.objects.create(
+            edicion=self.edicion,
+            documento="10002",
+            correo="dos@example.com",
+            habilitado=True,
+        )
+        Votante.objects.create(
+            edicion=self.edicion,
+            documento="10004",
+            correo="cuatro@example.com",
+            habilitado=True,
+        )
+        Votante.objects.create(
+            edicion=self.edicion,
+            documento="10003",
+            correo="tres@example.com",
+            habilitado=False,
+        )
+        self.crear_voto("report_voter_one", self.opcion_uno)
+        self.crear_voto("report_voter_two", self.opcion_uno)
+        self.crear_voto("report_voter_three", self.opcion_dos)
+
+        response = self.client.get(reverse("panel:reportes"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["censo"], 3)
+        self.assertEqual(response.context["total_votos"], 3)
+        self.assertEqual(response.context["participacion_pct"], 100)
+        self.assertContains(response, "Proceso cerrado")
+        self.assertContains(response, "Candidato uno")
+        self.assertContains(response, "Candidato dos")
+
+    def test_report_csv_exports_selected_vote_tally_and_metrics(self):
+        Votante.objects.create(
+            edicion=self.edicion,
+            documento="20001",
+            correo="habilitado@example.com",
+            habilitado=True,
+        )
+        self.crear_voto("report_csv_voter", self.opcion_uno)
+
+        response = self.client.get(
+            reverse("panel:reportes"),
+            {"votacion": self.votacion.pk, "export": "csv"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "text/csv; charset=utf-8")
+        self.assertIn("attachment;", response["Content-Disposition"])
+        self.assertIn("Candidato uno,1,100.00%", response.content.decode("utf-8"))
+        self.assertIn("Censo electoral habilitado,1", response.content.decode("utf-8"))
+        self.assertIn("Votos válidos emitidos,1", response.content.decode("utf-8"))
+
+    def test_report_rejects_an_unknown_voting_process(self):
+        response = self.client.get(
+            reverse("panel:reportes"),
+            {"votacion": "99999"},
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_report_includes_open_process_and_marks_its_results_as_partial(self):
+        ahora = timezone.now()
+        votacion_abierta = Votacion.objects.create(
+            categoria=self.categoria,
+            titulo="Proceso abierto",
+            fecha_apertura=ahora - timedelta(hours=1),
+            fecha_cierre=ahora + timedelta(hours=1),
+            estado=Votacion.Estado.ABIERTA,
+        )
+        opcion = Opcion.objects.create(
+            votacion=votacion_abierta,
+            nombre="Candidato en proceso",
+        )
+        Votante.objects.create(
+            edicion=self.edicion,
+            documento="30001",
+            correo="habilitado@example.com",
+            habilitado=True,
+        )
+        usuario = get_user_model().objects.create_user(
+            username="report_open_voter",
+        )
+        Voto.objects.create(
+            usuario=usuario,
+            edicion=self.edicion,
+            categoria=self.categoria,
+            votacion=votacion_abierta,
+            opcion=opcion,
+        )
+
+        response = self.client.get(
+            reverse("panel:reportes"),
+            {"votacion": votacion_abierta.pk},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["total_votos"], 1)
+        self.assertTrue(response.context["resultados_parciales"])
+        self.assertContains(response, "Resultados parciales de una votación abierta.")
+        self.assertContains(response, "Proceso abierto")
+
+
 class PublicVotingViewsTests(TestCase):
     def setUp(self):
         hoy = timezone.localdate()

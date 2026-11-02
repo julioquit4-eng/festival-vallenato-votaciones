@@ -7,7 +7,7 @@
    - Pantalla 11: Opciones y Candidatos (Bloqueo si el proceso está Abierto).
    - Pantalla 12: Votaciones (Validación de fechas: fin > inicio, confirmaciones).
    - Pantalla 13: Censo y Padrón (Simulación de carga CSV con filas inválidas).
-   - Pantalla 14: Reportes (Cálculo de participación y descarga CSV demo).
+   - Pantalla 14: Reportes y resultados administrativos.
    ========================================================================== */
 (function (window, document, VF) {
   'use strict';
@@ -380,79 +380,8 @@
      PANTALLA 14: REPORTES Y RESULTADOS ADMINISTRATIVOS
      ------------------------------------------------------------------------- */
   VF.pages.reportes = function () {
-    if (!VF.data) return;
-
-    var selectVote = document.getElementById('reportVoteSelect');
-    var repCensus = document.getElementById('repCensus');
-    var repTotalVotes = document.getElementById('repTotalVotes');
-    var repParticipation = document.getElementById('repParticipationPct');
     var tbody = document.querySelector('#reportResultsTable tbody');
-    var btnExport = document.getElementById('btnExportDemoCsv');
-
-    // Poblar Selector con Votaciones Cerradas (con resultados demo)
-    if (selectVote) {
-      selectVote.innerHTML = '';
-      VF.data.votaciones.filter(function (v) { return v.estado === 'cerrada'; }).forEach(function (v) {
-        var opt = document.createElement('option');
-        opt.value = v.id;
-        opt.textContent = v.nombre;
-        selectVote.appendChild(opt);
-      });
-    }
-
-    function renderReportForVote(voteId) {
-      var resultados = VF.data.resultados[voteId] || [];
-      var total = resultados.reduce(function (sum, item) { return sum + item.votos; }, 0);
-      var censo = 1250; // valor demo asignado
-      var pctPart = censo > 0 ? (total / censo * 100) : 0;
-
-      if (repCensus) repCensus.textContent = VF.fmtNum(censo);
-      if (repTotalVotes) repTotalVotes.textContent = VF.fmtNum(total);
-      if (repParticipation) repParticipation.textContent = VF.fmtPct(pctPart);
-
-      tbody.innerHTML = '';
-      resultados.sort(function (a, b) { return b.votos - a.votos; });
-
-      resultados.forEach(function (r, index) {
-        var op = VF.q.opcion(r.opcionId);
-        var pct = total > 0 ? (r.votos / total * 100) : 0;
-        var tr = document.createElement('tr');
-        tr.innerHTML = 
-          '<td class="text-center fw-bold">' + (index + 1) + '°</td>' +
-          '<td><strong>' + VF.esc(op ? op.nombre : 'Opción') + '</strong></td>' +
-          '<td>' + VF.fmtNum(r.votos) + ' votos</td>' +
-          '<td>' + VF.fmtPct(pct) + '</td>' +
-          '<td style="min-width: 140px;">' +
-            '<div class="progress" style="height: 10px;">' +
-              '<div class="progress-bar bg-primary" style="width: ' + pct.toFixed(1) + '%"></div>' +
-            '</div>' +
-          '</td>';
-        tbody.appendChild(tr);
-      });
-    }
-
-    if (selectVote) {
-      selectVote.addEventListener('change', function (e) {
-        renderReportForVote(e.target.value);
-      });
-      renderReportForVote(selectVote.value);
-    }
-
-    // Exportación simulada a CSV
-    if (btnExport) {
-      btnExport.addEventListener('click', function () {
-        var vote = VF.q.votacion(selectVote.value);
-        var resultados = VF.data.resultados[selectVote.value] || [];
-        var csvContent = 'Posicion,Candidato,Votos,Porcentaje\n';
-        resultados.forEach(function (r, i) {
-          var op = VF.q.opcion(r.opcionId);
-          csvContent += (i + 1) + ',"' + (op ? op.nombre : 'Opción') + '",' + r.votos + '\n';
-        });
-
-        VF.download('Reporte_Demo_' + (vote ? vote.id : 'votacion') + '.csv', csvContent);
-        VF.toast('Reporte exportado exitosamente con datos de demostración.', 'info');
-      });
-    }
+    if (tbody && tbody.dataset.source === 'database') return;
   };
 
 })(window, document, window.VF);

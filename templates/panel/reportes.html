@@ -15,16 +15,22 @@
   <div class="panel-card__head">
     <div class="d-flex align-items-center gap-3 flex-wrap">
       <h2><i class="bi bi-file-earmark-bar-graph me-2 text-primary"></i> Informe Consolidado por Proceso</h2>
-      <select class="form-select form-select-sm" id="reportVoteSelect" style="max-width: 320px;">
-        <!-- Dinámico con admin.js -->
-      </select>
+      <form method="get" id="reportForm" class="d-flex">
+        <select class="form-select form-select-sm" id="reportVoteSelect" name="votacion" style="max-width: 320px;" onchange="this.form.submit()">
+          {% for votacion in votaciones %}
+          <option value="{{ votacion.pk }}" {% if votacion.pk == votacion_seleccionada.pk %}selected{% endif %}>
+            {{ votacion.titulo }} — {{ votacion.categoria.nombre }} ({{ votacion.categoria.edicion.anio }}) · {{ votacion.get_estado_display }}
+          </option>
+          {% endfor %}
+        </select>
+      </form>
     </div>
     <div class="d-flex gap-2">
       <button type="button" class="btn btn-sm btn-vf-outline" data-action="print">
         <i class="bi bi-printer"></i> Vista Imprimible
       </button>
-      <button type="button" class="btn btn-sm btn-vf" id="btnExportDemoCsv">
-        <i class="bi bi-download"></i> Descargar CSV Demo
+      <button type="submit" class="btn btn-sm btn-vf" id="btnExportCsv" name="export" value="csv" form="reportForm" {% if not votacion_seleccionada %}disabled{% endif %}>
+        <i class="bi bi-download"></i> Descargar CSV
       </button>
     </div>
   </div>
@@ -35,19 +41,19 @@
       <div class="col-md-4">
         <div class="p-3 bg-light rounded-3 border">
           <small class="text-muted d-block text-uppercase fw-bold" style="font-size:0.7rem;">Censo Electoral Habilitado</small>
-          <div class="h3 fw-bold mb-0 text-dark" id="repCensus">1,250</div>
+          <div class="h3 fw-bold mb-0 text-dark" id="repCensus">{{ censo|default:0 }}</div>
         </div>
       </div>
       <div class="col-md-4">
         <div class="p-3 bg-light rounded-3 border">
           <small class="text-muted d-block text-uppercase fw-bold" style="font-size:0.7rem;">Votos Válidos Emitidos</small>
-          <div class="h3 fw-bold mb-0 text-primary" id="repTotalVotes">534</div>
+          <div class="h3 fw-bold mb-0 text-primary" id="repTotalVotes">{{ total_votos|default:0 }}</div>
         </div>
       </div>
       <div class="col-md-4">
         <div class="p-3 bg-light rounded-3 border">
           <small class="text-muted d-block text-uppercase fw-bold" style="font-size:0.7rem;">Porcentaje de Participación</small>
-          <div class="h3 fw-bold mb-0 text-success" id="repParticipationPct">42.7 %</div>
+          <div class="h3 fw-bold mb-0 text-success" id="repParticipationPct">{{ participacion_pct|floatformat:1 }} %</div>
         </div>
       </div>
     </div>
@@ -65,15 +71,33 @@
             <th>Gráfico de Representación</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- Dinámico -->
+        <tbody data-source="database">
+          {% for opcion in resultados %}
+          <tr>
+            <td class="text-center fw-bold">{{ forloop.counter }}°</td>
+            <td><strong>{{ opcion.nombre }}</strong></td>
+            <td>{{ opcion.total_votos }} votos</td>
+            <td>{{ opcion.porcentaje|floatformat:1 }} %</td>
+            <td style="min-width: 140px;">
+              <div class="progress" style="height: 10px;">
+                <div class="progress-bar bg-primary" style="width: {{ opcion.porcentaje|floatformat:1 }}%"></div>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="text-center py-4 text-muted">
+              {% if votacion_seleccionada %}No hay opciones registradas para esta votación.{% else %}No hay votaciones abiertas o cerradas disponibles para generar reportes.{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>
 
     <div class="mt-4 pt-3 border-top text-muted small d-flex justify-content-between align-items-center">
-      <span><i class="bi bi-info-circle me-1"></i> Reporte generado a partir de datos de prueba precalculados.</span>
-      <span class="fst-italic">La auditoría definitiva y firma digital se efectuará en la etapa de backend.</span>
+      <span><i class="bi bi-info-circle me-1"></i> Reporte calculado a partir de los votos registrados y el padrón habilitado.{% if resultados_parciales %} Resultados parciales de una votación abierta.{% endif %}</span>
+      <span class="fst-italic">Los datos corresponden a los registros disponibles en el sistema.</span>
     </div>
   </div>
 </div>

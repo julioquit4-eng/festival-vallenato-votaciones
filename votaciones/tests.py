@@ -1272,7 +1272,7 @@ class FlujoRegistroVotoTests(TestCase):
         comprobante = self.client.get(
             reverse("public:comprobante_voto", args=[voto.pk])
         )
-        self.assertContains(comprobante, "VF-1")
+        self.assertContains(comprobante, f"VF-{voto.pk}")
         self.assertContains(comprobante, self.votacion.titulo)
 
     def test_vote_requires_authenticated_user(self):

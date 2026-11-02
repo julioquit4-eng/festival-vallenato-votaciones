@@ -1,5 +1,7 @@
+from django.http import JsonResponse
 from django.shortcuts import render
 
+from .models import Edicion
 
 # Portal público
 
@@ -72,8 +74,6 @@ def panel_votantes(request):
 def panel_reportes(request):
     return render(request, "panel/reportes.html")
 
-from django.http import JsonResponse
-from .models import Edicion
 
 def api_categorias(request):
     ediciones = (

@@ -184,6 +184,8 @@ class Opcion(models.Model):
             )
         ]
 
+    def __str__(self):
+    	return f"{self.nombre} - {self.votacion.titulo}"
 
 class Voto(models.Model):
     usuario = models.ForeignKey(

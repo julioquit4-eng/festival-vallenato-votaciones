@@ -17,6 +17,11 @@ public_patterns = (
             name="detalle_votacion",
         ),
         path(
+            "votaciones/<int:votacion_id>/votar/",
+            views.emitir_voto,
+            name="emitir_voto",
+        ),
+        path(
             "votaciones/acceso/",
             views.acceso_votante,
             name="acceso_votante",
@@ -51,6 +56,21 @@ public_patterns = (
             views.login,
             name="login",
         ),
+        path(
+            "cerrar-sesion/",
+            views.cerrar_sesion,
+            name="cerrar_sesion",
+        ),
+        path(
+            "mis-votos/",
+            views.categorias_votadas,
+            name="categorias_votadas",
+        ),
+        path(
+            "votaciones/comprobante/<int:voto_id>/",
+            views.comprobante_voto,
+            name="comprobante_voto",
+        ),
     ],
     "public",
 )
@@ -69,9 +89,24 @@ panel_patterns = (
             name="ediciones",
         ),
         path(
+            "ediciones/<int:pk>/eliminar/",
+            views.panel_eliminar_edicion,
+            name="eliminar_edicion",
+        ),
+        path(
             "categorias/",
             views.panel_categorias,
             name="categorias",
+        ),
+        path(
+            "categorias/<int:pk>/editar/",
+            views.panel_editar_categoria,
+            name="editar_categoria",
+        ),
+        path(
+            "categorias/<int:pk>/eliminar/",
+            views.panel_eliminar_categoria,
+            name="eliminar_categoria",
         ),
         path(
             "votaciones/",
@@ -79,9 +114,39 @@ panel_patterns = (
             name="votaciones",
         ),
         path(
+            "votaciones/crear/",
+            views.panel_crear_votacion,
+            name="crear_votacion",
+        ),
+        path(
+            "votaciones/<int:pk>/editar/",
+            views.panel_editar_votacion,
+            name="editar_votacion",
+        ),
+        path(
+            "votaciones/<int:pk>/eliminar/",
+            views.panel_eliminar_votacion,
+            name="eliminar_votacion",
+        ),
+        path(
             "opciones/",
             views.panel_opciones,
             name="opciones",
+        ),
+        path(
+            "opciones/crear/",
+            views.panel_crear_opcion,
+            name="crear_opcion",
+        ),
+        path(
+            "opciones/<int:pk>/editar/",
+            views.panel_editar_opcion,
+            name="editar_opcion",
+        ),
+        path(
+            "opciones/<int:pk>/eliminar/",
+            views.panel_eliminar_opcion,
+            name="eliminar_opcion",
         ),
         path(
             "votantes/",

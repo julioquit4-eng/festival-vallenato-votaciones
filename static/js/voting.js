@@ -162,6 +162,7 @@
 
     var container = document.getElementById('featuredVotes');
     var statAbiertas = document.querySelector('[data-stat="abiertas"]');
+    if (container && container.dataset.source === 'database') return;
     if (!VF.data) return;
 
     var abiertas = VF.data.votaciones.filter(function (v) { return v.estado === 'abierta'; });
@@ -229,7 +230,67 @@
     var currentFilter = 'todas';
     var currentSearch = '';
 
-    if (!VF.data) return;
+    if (!container) return;
+    if (!VF.data || container.dataset.source === 'database') {
+      var cards = Array.prototype.slice.call(container.querySelectorAll('[data-vote-card]'));
+      var counts = {
+        todas: cards.length,
+        abierta: cards.filter(function (card) { return card.dataset.status === 'abierta'; }).length,
+        proxima: cards.filter(function (card) { return card.dataset.status === 'proxima'; }).length,
+        cerrada: cards.filter(function (card) { return card.dataset.status === 'cerrada'; }).length
+      };
+
+      Object.keys(counts).forEach(function (status) {
+        var count = document.getElementById({
+          todas: 'countTodas',
+          abierta: 'countAbiertas',
+          proxima: 'countProximas',
+          cerrada: 'countCerradas'
+        }[status]);
+        if (count) count.textContent = counts[status];
+      });
+
+      function filterRenderedCards() {
+        var visibleCount = 0;
+        cards.forEach(function (card) {
+          var matchesStatus = currentFilter === 'todas' || card.dataset.status === currentFilter;
+          var matchesText = card.textContent.toLowerCase().indexOf(currentSearch.trim().toLowerCase()) !== -1;
+          var visible = matchesStatus && matchesText;
+          card.parentElement.classList.toggle('d-none', !visible);
+          if (visible) visibleCount += 1;
+        });
+        if (emptyBox) emptyBox.classList.toggle('d-none', visibleCount > 0);
+      }
+
+      chipButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          chipButtons.forEach(function (chip) { chip.setAttribute('aria-pressed', 'false'); });
+          button.setAttribute('aria-pressed', 'true');
+          currentFilter = button.dataset.statusFilter;
+          filterRenderedCards();
+        });
+      });
+      if (searchInput) {
+        searchInput.addEventListener('input', function () {
+          currentSearch = searchInput.value;
+          filterRenderedCards();
+        });
+      }
+      var resetRenderedFilters = document.getElementById('btnResetFilters');
+      if (resetRenderedFilters) {
+        resetRenderedFilters.addEventListener('click', function () {
+          currentFilter = 'todas';
+          currentSearch = '';
+          if (searchInput) searchInput.value = '';
+          chipButtons.forEach(function (button) {
+            button.setAttribute('aria-pressed', button.dataset.statusFilter === 'todas');
+          });
+          filterRenderedCards();
+        });
+      }
+      filterRenderedCards();
+      return;
+    }
 
     // Actualizar contadores en los chips
     var todas = VF.data.votaciones.length;
@@ -349,6 +410,8 @@
      PANTALLA 3: DETALLE DE VOTACIÓN Y SELECCIÓN EXCLUSIVA DE CANDIDATOS
      ------------------------------------------------------------------------- */
   VF.pages.detalle_votacion = function () {
+    if (document.getElementById('serverVoteDetail')) return;
+
     var voteId = getActiveVoteId();
     sessionVoterState.selectedVoteId = voteId;
 
@@ -460,51 +523,12 @@
   };
 
   /* -------------------------------------------------------------------------
-     PANTALLA 4: VALIDACIÓN DEL VOTANTE (ACCESO)
-     ------------------------------------------------------------------------- */
-  VF.pages.acceso_votante = function () {
-    var voteId = getActiveVoteId();
-    var optId = VF.param('opt') || sessionVoterState.selectedOptionId || 'op-01';
-    sessionVoterState.selectedVoteId = voteId;
-    sessionVoterState.selectedOptionId = optId;
-
-    var vote = VF.q.votacion(voteId) || VF.data.votaciones[0];
-    var opcion = VF.q.opcion(optId) || VF.data.opciones[0];
-
-    var elVoteTitle = document.getElementById('authVoteTitleSummary');
-    var elCandidate = document.getElementById('authCandidateSummary');
-    if (elVoteTitle) elVoteTitle.textContent = vote.nombre;
-    if (elCandidate) elCandidate.textContent = 'Candidato: ' + opcion.nombre;
-
-    var form = document.getElementById('voterLoginForm');
-    if (form) {
-      form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        var isValid = VF.validate(form);
-        if (!isValid) {
-          VF.toast('Por favor completa todos los campos requeridos correctamente.', 'danger');
-          return;
-        }
-
-        var doc = document.getElementById('cedulaInput').value.trim();
-        var email = document.getElementById('correoInput').value.trim();
-
-        // Enmascaramos datos en memoria temporal (no guardar en claro)
-        sessionVoterState.voterDoc = 'C.C. ••••••' + doc.slice(-3);
-        sessionVoterState.voterEmail = email.replace(/(.{2})(.*)(?=@)/, function (_, a, b) { return a + '•••'; });
-
-        VF.toast('Identidad validada en modo demostración.', 'success');
-        setTimeout(function () {
-          window.location.href = VF.url('confirmar', { v: vote.id, opt: opcion.id });
-        }, 400);
-      });
-    }
-  };
-
-  /* -------------------------------------------------------------------------
      PANTALLA 5: CONFIRMACIÓN DEL VOTO Y SEGUNDA CONFIRMACIÓN MODAL
      ------------------------------------------------------------------------- */
   VF.pages.confirmar_voto = function () {
+    if (document.getElementById('serverVoteConfirmation')) return;
+    if (!VF.data || !VF.q) return;
+
     var voteId = getActiveVoteId();
     var optId = VF.param('opt') || sessionVoterState.selectedOptionId || 'op-01';
 
@@ -562,6 +586,9 @@
      PANTALLA 6: COMPROBANTE DE VOTO
      ------------------------------------------------------------------------- */
   VF.pages.comprobante = function () {
+    if (document.getElementById('serverVoteReceipt')) return;
+    if (!VF.data || !VF.q) return;
+
     var voteId = getActiveVoteId();
     var vote = VF.q.votacion(voteId) || VF.data.votaciones[0];
     var cat = VF.q.categoria(vote.categoriaId);
@@ -687,162 +714,9 @@
     }
   };
   /* -------------------------------------------------------------------------
-     MANEJO DEL MODAL DE ACCESO DEL VOTANTE (GLOBAL)
-     ------------------------------------------------------------------------- */
-  function initVoterModalHandler() {
-    var modalForm = document.getElementById('modalVoterForm');
-    if (!modalForm) return;
-
-    modalForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var isValid = VF.validate(modalForm);
-      if (!isValid) {
-        VF.toast('Por favor completa todos los campos requeridos.', 'danger');
-        return;
-      }
-
-      var doc = document.getElementById('modalCedulaInput').value.trim();
-      var email = document.getElementById('modalCorreoInput').value.trim();
-
-      // Guardar en sesión de memoria del prototipo
-      sessionVoterState.voterDoc = 'C.C. ••••••' + doc.slice(-3);
-      sessionVoterState.voterEmail = email.replace(/(.{2})(.*)(?=@)/, function (_, a, b) { return a + '•••'; });
-
-      // Ocultar modal
-      var modalEl = document.getElementById('voterAccessModal');
-      if (modalEl && window.bootstrap) {
-        var modal = window.bootstrap.Modal.getInstance(modalEl);
-        if (modal) modal.hide();
-      }
-
-      VF.toast('Identidad validada con éxito.', 'success');
-
-      // Si ya hay opción elegida, ir a confirmar voto; si no, ir a listado de votaciones
-      setTimeout(function () {
-        var vId = sessionVoterState.selectedVoteId || 'v-prof';
-        var oId = sessionVoterState.selectedOptionId;
-        if (oId) {
-          window.location.href = VF.url('confirmar', { v: vId, opt: oId });
-        } else {
-          window.location.href = VF.url('votaciones');
-        }
-      }, 400);
-    });
-  }
-
-  /* -------------------------------------------------------------------------
-     MANEJO DEL MODAL DE INICIO DE SESIÓN (LOGIN MODAL GLOBAL)
-     ------------------------------------------------------------------------- */
-  function initLoginModalHandler() {
-    // Votante en Modal
-    var modalVoterForm = document.getElementById('modalVoterLoginForm');
-    if (modalVoterForm) {
-      modalVoterForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-        if (!VF.validate(modalVoterForm)) {
-          VF.toast('Por favor completa todos los campos requeridos.', 'danger');
-          return;
-        }
-
-        var doc = document.getElementById('modalLoginCedula').value.trim();
-        var email = document.getElementById('modalLoginCorreo').value.trim();
-
-        sessionVoterState.voterDoc = 'C.C. ••••••' + doc.slice(-3);
-        sessionVoterState.voterEmail = email.replace(/(.{2})(.*)(?=@)/, function (_, a, b) { return a + '•••'; });
-
-        var modalEl = document.getElementById('loginModal');
-        if (modalEl && window.bootstrap) {
-          var modal = window.bootstrap.Modal.getInstance(modalEl);
-          if (modal) modal.hide();
-        }
-
-        VF.toast('¡Identidad validada con éxito! Ingresando a las votaciones...', 'success');
-        setTimeout(function () {
-          window.location.href = VF.url('votaciones');
-        }, 500);
-      });
-    }
-
-    // Administrador en Modal
-    var modalAdminForm = document.getElementById('modalAdminLoginForm');
-    if (modalAdminForm) {
-      modalAdminForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-        if (!VF.validate(modalAdminForm)) {
-          VF.toast('Ingresa tu usuario y contraseña institucional.', 'danger');
-          return;
-        }
-
-        var modalEl = document.getElementById('loginModal');
-        if (modalEl && window.bootstrap) {
-          var modal = window.bootstrap.Modal.getInstance(modalEl);
-          if (modal) modal.hide();
-        }
-
-        VF.toast('¡Credenciales autorizadas! Accediendo al Panel de Control...', 'success');
-        setTimeout(function () {
-          window.location.href = VF.url('panel_dashboard');
-        }, 500);
-      });
-    }
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () {
-      initVoterModalHandler();
-      initLoginModalHandler();
-    });
-  } else {
-    initVoterModalHandler();
-    initLoginModalHandler();
-  }
-
-  /* -------------------------------------------------------------------------
      PANTALLAS INFORMATIVAS Y AUTENTICACIÓN
      ------------------------------------------------------------------------- */
   VF.pages.guia = function () {};
   VF.pages.privacidad = function () {};
-
-  VF.pages.login = function () {
-    // Formulario de Votante
-    var voterForm = document.getElementById('voterDirectLoginForm');
-    if (voterForm) {
-      voterForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-        if (!VF.validate(voterForm)) {
-          VF.toast('Por favor completa todos los campos requeridos.', 'danger');
-          return;
-        }
-
-        var cedula = document.getElementById('loginCedula').value.trim();
-        var correo = document.getElementById('loginCorreo').value.trim();
-
-        sessionVoterState.voterDoc = 'C.C. ••••••' + cedula.slice(-3);
-        sessionVoterState.voterEmail = correo.replace(/(.{2})(.*)(?=@)/, function (_, a, b) { return a + '•••'; });
-
-        VF.toast('¡Identidad validada con éxito! Ingresando a las votaciones...', 'success');
-        setTimeout(function () {
-          window.location.href = VF.url('votaciones');
-        }, 500);
-      });
-    }
-
-    // Formulario de Administrador
-    var adminForm = document.getElementById('adminLoginForm');
-    if (adminForm) {
-      adminForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-        if (!VF.validate(adminForm)) {
-          VF.toast('Ingresa tu usuario y contraseña institucional.', 'danger');
-          return;
-        }
-
-        VF.toast('¡Credenciales autorizadas! Accediendo al Panel de Control...', 'success');
-        setTimeout(function () {
-          window.location.href = VF.url('panel_dashboard');
-        }, 500);
-      });
-    }
-  };
 
 })(window, document, window.VF);

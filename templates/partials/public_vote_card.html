@@ -1,0 +1,32 @@
+<article class="vf-card vote-card vf-card--window-royal" data-vote-card data-status="{{ votacion.estado_publico }}">
+  <div class="vote-card__media">
+    <div class="vf-art vf-art--night"><i class="bi bi-music-note-beamed"></i></div>
+    <div class="vote-card__status">
+      <span class="vf-status vf-status--{{ votacion.estado_publico }}">
+        {% if votacion.estado_publico == "abierta" %}
+          <i class="bi bi-unlock-fill" aria-hidden="true"></i>Abierta
+        {% elif votacion.estado_publico == "proxima" %}
+          <i class="bi bi-hourglass-split" aria-hidden="true"></i>Próximamente
+        {% else %}
+          <i class="bi bi-lock-fill" aria-hidden="true"></i>Cerrada
+        {% endif %}
+      </span>
+    </div>
+  </div>
+  <div class="vote-card__body">
+    <span class="vote-card__cat">{{ votacion.categoria.nombre }}</span>
+    <h2 class="vote-card__title h4">
+      <a href="{% url 'public:detalle_votacion' %}?v={{ votacion.pk }}" class="text-decoration-none text-dark">{{ votacion.titulo }}</a>
+    </h2>
+    <p class="vote-card__desc">{{ votacion.descripcion|default:"Consulta los detalles de esta votación." }}</p>
+    <div class="vote-card__dates">
+      <i class="bi bi-clock" aria-hidden="true"></i>
+      <span>Apertura: {{ votacion.fecha_apertura|date:"j M Y, H:i" }} · Cierre: {{ votacion.fecha_cierre|date:"j M Y, H:i" }}</span>
+    </div>
+  </div>
+  <div class="vote-card__foot">
+    <a href="{% url 'public:detalle_votacion' %}?v={{ votacion.pk }}" class="btn btn-vf-outline btn-sm w-100">
+      Consultar detalles <i class="bi bi-arrow-right"></i>
+    </a>
+  </div>
+</article>

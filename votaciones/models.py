@@ -270,3 +270,39 @@ class Voto(models.Model):
 
     def __str__(self):
         return f"{self.nombre} - {self.votacion.titulo}"
+
+
+class Votante(models.Model):
+    usuario = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name="registro_votante",
+        null=True,
+        blank=True,
+        verbose_name="Cuenta de usuario",
+    )
+    edicion = models.ForeignKey(
+        Edicion,
+        on_delete=models.CASCADE,
+        related_name="votantes",
+        verbose_name="Edición",
+    )
+    documento = models.CharField(max_length=32, verbose_name="Documento")
+    correo = models.EmailField(max_length=254, verbose_name="Correo")
+    habilitado = models.BooleanField(default=True, verbose_name="Habilitado")
+    creado_en = models.DateTimeField(auto_now_add=True, verbose_name="Registrado")
+    actualizado_en = models.DateTimeField(auto_now=True, verbose_name="Actualizado")
+
+    class Meta:
+        verbose_name = "Votante"
+        verbose_name_plural = "Votantes"
+        ordering = ["documento"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["edicion", "documento"],
+                name="votante_unico_por_edicion",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.documento} - {self.edicion.anio}"

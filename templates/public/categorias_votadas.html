@@ -1,0 +1,34 @@
+{% extends "public/base_public.html" %}
+
+{% block title %}Mi participación{% endblock %}
+{% block page_id %}categorias_votadas{% endblock %}
+{% block nav_section %}votaciones{% endblock %}
+
+{% block content %}
+<header class="page-hero">
+  <div class="container">
+    <h1>Mi participación</h1>
+    <p>Consulta las categorías en las que has registrado tu voto.</p>
+  </div>
+</header>
+
+<div class="container my-5">
+  <div class="row g-4">
+    {% for voto in votos %}
+      <div class="col-md-6 col-lg-4">
+        <article class="vf-card vote-card">
+          <div class="vote-card__body">
+            <h2 class="vote-card__title h4">{{ voto.categoria.nombre }}</h2>
+            <p class="vote-card__desc">{{ voto.categoria.edicion.nombre }} · {{ voto.categoria.edicion.anio }}</p>
+            <p class="small text-muted mb-0">Registrado el {{ voto.fecha_hora|date:"d/m/Y H:i" }}</p>
+          </div>
+        </article>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <p class="text-center text-muted py-5">Aún no has votado en ninguna categoría.</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

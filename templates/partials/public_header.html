@@ -1,8 +1,9 @@
+{% load static %}
 <header class="site-header">
   <nav class="navbar navbar-expand-lg" aria-label="Navegación principal">
     <div class="container">
       <a class="vf-brand" href="{% url 'public:inicio' %}" aria-label="Festival Vallenato · Votaciones 2027, ir al inicio">
-        <span class="vf-brand__mark" aria-hidden="true"><i class="bi bi-music-note-beamed"></i></span>
+        <img class="vf-brand__logo" src="{% static 'img/logo-festival.png' %}" alt="" width="180" height="192">
         <span class="vf-brand__text">
           <span class="vf-brand__name">Festival Vallenato</span>
           <span class="vf-brand__sub">Votaciones · 2027</span>
@@ -25,7 +26,7 @@
                 <i class="bi bi-speedometer2" aria-hidden="true"></i>Panel administrativo
               </a>
             {% else %}
-              <a class="btn btn-vf-outline btn-sm" href="{% url 'public:categorias_votadas' %}">
+              <a class="btn btn-vf-outline btn-sm" data-nav="participacion" href="{% url 'public:categorias_votadas' %}">
                 <i class="bi bi-card-checklist" aria-hidden="true"></i>Mi participación
               </a>
             {% endif %}

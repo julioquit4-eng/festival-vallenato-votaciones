@@ -82,6 +82,18 @@
   font-size: 1.2rem;
 }
 
+/* Logo del proyecto (PNG sin fondo con contorno blanco). */
+.vf-brand__logo {
+  width: 2.75rem;
+  height: auto;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px rgba(11, 30, 54, .18));
+}
+
+.vf-brand__logo--lg {
+  width: 4.5rem;
+}
+
 .vf-brand__text {
   line-height: 1.05;
 }
@@ -166,12 +178,22 @@
 .hero__grid {
   display: grid;
   grid-template-columns: 1fr;
-  min-height: calc(100vh - 120px);
 }
 
 @media (min-width: 992px) {
   .hero__grid {
-    grid-template-columns: 1.05fr 1fr;
+    /* Dos mitades: texto a la izquierda, foto a sangre a la derecha.
+       La sección ocupa justo la pantalla bajo el encabezado (76 px),
+       con un mínimo para pantallas bajas y un máximo para monitores grandes. */
+    grid-template-columns: 1fr 1fr;
+    min-height: clamp(540px, calc(100svh - 76px), 820px);
+  }
+}
+
+/* Entre 992 y 1199 px el menú ocupa dos líneas y el encabezado mide ~92 px */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .hero__grid {
+    min-height: clamp(540px, calc(100svh - 92px), 820px);
   }
 }
 
@@ -183,9 +205,9 @@
 }
 
 .hero__title {
-  font-size: clamp(2.6rem, 6.4vw, 5.2rem);
+  font-size: clamp(2.4rem, 4.4vw, 4.4rem);
   line-height: .98;
-  margin: 1.25rem 0 1.5rem;
+  margin: 1rem 0 1.25rem;
 }
 
 .hero__title em {
@@ -203,9 +225,9 @@
 .hero__meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 1.25rem 2rem;
-  margin-top: 2.25rem;
-  padding-top: 1.5rem;
+  gap: .75rem 2rem;
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
   border-top: 1px solid var(--vf-line);
   font-size: .85rem;
   color: var(--vf-muted);
@@ -250,7 +272,7 @@
 .hero__copy {
   position: relative;
   z-index: 1;
-  padding: clamp(2.5rem, 5vw, 5rem) clamp(1.25rem, 4vw, 3.5rem);
+  padding: clamp(1.75rem, 3vw, 3rem) clamp(1.25rem, 4vw, 3.5rem);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -318,68 +340,57 @@
 }
 
 /* Contenedor Visual con Slider de Experiencias Culturales (Referencia Imagen 3) */
+/* Mitad derecha: la foto ocupa todo el espacio (a sangre), sin bordes ni
+   efectos al pasar el cursor. El texto y los controles van sobre la foto. */
 .hero__visual {
   position: relative;
   background: #0B1E36;
-  background-image: 
-    radial-gradient(circle at 90% 10%, rgba(255, 186, 0, .25), transparent 50%),
-    radial-gradient(circle at 10% 90%, rgba(0, 80, 216, .35), transparent 60%),
-    url('../img/musical-waves.svg');
-  background-size: auto, auto, 100% auto;
-  background-repeat: no-repeat, no-repeat, repeat-x;
-  background-position: center, center, center bottom;
-  padding: clamp(2rem, 4vw, 3.5rem);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 560px;
+  min-height: 460px;
   overflow: hidden;
 }
 
 .hero-slider-wrap {
-  position: relative;
-  z-index: 2;
-  width: 100%;
+  position: absolute;
+  inset: 0;
 }
 
 .hero-slider-card {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 11;
-  max-height: 380px;
-  border-radius: 28px;
-  overflow: hidden;
-  box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.65);
-  border: 2px solid rgba(255, 255, 255, 0.25);
-  transition: opacity 0.4s ease, transform 0.15s ease-out;
-  will-change: transform;
-  transform-style: preserve-3d;
+  position: absolute;
+  inset: 0;
 }
 
 .hero-slider-card img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  object-position: center;
+  transition: opacity .45s ease;
 }
 
-.hero-slider-card:hover img {
-  transform: scale(1.06);
+.hero-slider-card img.is-fading,
+.hero-slider-card__content.is-fading {
+  opacity: 0;
 }
 
+/* Degradado solo en la parte baja para que el texto blanco sea legible */
 .hero-slider-card::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(11, 30, 54, 0.1) 0%, rgba(11, 30, 54, 0.45) 45%, rgba(11, 30, 54, 0.95) 100%);
+  background: linear-gradient(180deg, rgba(11, 30, 54, 0) 35%, rgba(11, 30, 54, .55) 62%, rgba(11, 30, 54, .92) 100%);
+  pointer-events: none;
 }
 
 .hero-slider-card__content {
   position: absolute;
   inset: auto 0 0 0;
-  padding: 1.5rem 1.75rem;
+  /* Deja espacio abajo para la fila de controles */
+  padding: 1.5rem clamp(1.25rem, 3vw, 2.5rem) 5.75rem;
   z-index: 2;
   color: #FFFFFF;
+  transition: opacity .3s ease;
 }
 
 .hero-slider-card__title {
@@ -388,6 +399,9 @@
   font-weight: 700;
   margin: 0.35rem 0 0.25rem;
   line-height: 1.15;
+  /* El h2 tiene color oscuro global; sobre la foto debe ser claro y legible. */
+  color: #FFFFFF;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
 }
 
 .hero-slider-card__desc {
@@ -399,10 +413,13 @@
 
 /* Controles del Slider (Referencia Imagen 3) */
 .hero-slider-controls {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 3;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 1.25rem;
+  padding: 0 clamp(1.25rem, 3vw, 2.5rem) 1.5rem;
   gap: 1rem;
 }
 
@@ -425,7 +442,19 @@
   background: var(--vf-yellow);
   color: var(--vf-night);
   border-color: var(--vf-yellow);
-  transform: scale(1.08);
+}
+
+.hero-slider-btn:focus-visible,
+.hero-slider-dot:focus-visible {
+  outline: 3px solid var(--vf-yellow);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-slider-card img,
+  .hero-slider-card__content {
+    transition: none;
+  }
 }
 
 .hero-slider-counter {
@@ -434,6 +463,7 @@
   font-weight: 700;
   color: #FFFFFF;
   letter-spacing: 0.08em;
+  white-space: nowrap;
 }
 
 /* Indicadores / Miniaturas del Slider */
@@ -542,9 +572,15 @@
   }
 
   .hero__visual {
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
+    min-height: 430px;
+  }
+
+  .hero-slider-dot {
+    width: 16px;
+  }
+
+  .hero-slider-dot.is-active {
+    width: 28px;
   }
 }
 
@@ -1091,6 +1127,23 @@
   outline-offset: 3px;
 }
 
+/* Detalle de votación: la tarjeta de la opción elegida se resalta igual que .option-card.is-selected,
+   para que la selección sea inequívoca y no dependa solo del punto del radio. */
+label.vf-card:has(> input[type="radio"]) {
+  cursor: pointer;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+label.vf-card:has(> input[type="radio"]:checked) {
+  border-color: var(--vf-night);
+  box-shadow: 0 0 0 4px rgba(216, 173, 85, .35), var(--vf-shadow);
+}
+
+label.vf-card:has(> input[type="radio"]:focus-visible) {
+  outline: 3px solid var(--vf-gold);
+  outline-offset: 3px;
+}
+
 .option-card.is-disabled {
   cursor: not-allowed;
   opacity: .6;
@@ -1521,6 +1574,11 @@
 }
 
 .site-footer .vf-brand {
+  color: #fff;
+}
+
+/* .vf-brand__name define su propio color oscuro; en el pie el fondo es oscuro. */
+.site-footer .vf-brand__name {
   color: #fff;
 }
 

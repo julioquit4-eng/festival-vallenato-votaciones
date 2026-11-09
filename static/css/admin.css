@@ -90,6 +90,12 @@ body.panel {
   place-items: center;
 }
 
+.panel-brand .vf-brand__logo {
+  width: 2.6rem;
+  height: auto;
+  flex-shrink: 0;
+}
+
 .panel-brand strong {
   display: block;
   font-family: var(--vf-font-display);

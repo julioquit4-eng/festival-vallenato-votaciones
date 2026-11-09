@@ -19,20 +19,20 @@
       <span class="vf-demo-tag"><i class="bi bi-cone-striped"></i>Informativo</span>
     </div>
     <h1>¿Cómo participar en las votaciones?</h1>
-    <p>Consulta las votaciones y sus opciones. La validación de votantes y la emisión de votos aún no están habilitadas.</p>
+    <p>Consulta las votaciones abiertas, inicia sesión con tus datos del padrón y registra un voto por categoría.</p>
   </div>
 </header>
 
 <div class="container my-5">
-  <div class="vf-alert vf-alert--warning mb-5" role="status">
-    <i class="bi bi-exclamation-triangle-fill"></i>
-    <div><strong>Participación pendiente:</strong> por ahora este portal permite consultar la información disponible. No se reciben votos ni se validan documentos o correos.</div>
+  <div class="vf-alert vf-alert--info mb-5" role="status">
+    <i class="bi bi-info-circle-fill"></i>
+    <div><strong>Antes de votar:</strong> necesitas iniciar sesión con tu número de cédula y el correo registrados en el padrón habilitado de la edición. Puedes votar una sola vez en cada categoría abierta.</div>
   </div>
   <div class="row g-5">
     <!-- Columna de Pasos (Timeline) -->
     <div class="col-lg-7">
-      <h2 class="h3 mb-4">Proceso previsto</h2>
-      
+      <h2 class="h3 mb-4">Cómo votar paso a paso</h2>
+
       <ol class="timeline">
         <li>
           <div class="vf-card">
@@ -42,38 +42,38 @@
         </li>
         <li>
           <div class="vf-card">
-            <h3>2. Conoce a los candidatos u opciones</h3>
-            <p>Accede al detalle de la categoría para conocer la reseña artística, repertorio o datos autorizados de cada concursante o agrupación participante.</p>
+            <h3>2. Conoce las opciones</h3>
+            <p>Abre el detalle de la votación para ver las opciones participantes y su descripción.</p>
           </div>
         </li>
         <li>
           <div class="vf-card">
-            <h3>3. Selecciona tu opción predilecta</h3>
-            <p>Elige de manera exclusiva a tu candidato de preferencia marcando su tarjeta correspondiente. No es posible seleccionar más de una opción en una votación uninominal.</p>
+            <h3>3. Inicia sesión como votante</h3>
+            <p>En <a href="{% url 'public:login' %}">Iniciar sesión</a>, pestaña Votante, escribe tu número de cédula y tu correo registrados. Solo pueden votar quienes estén habilitados en el padrón de la edición.</p>
           </div>
         </li>
         <li>
           <div class="vf-card">
-            <h3>4. Valida tu identidad en el padrón</h3>
-            <p>Ingresa tu número de documento de identidad y tu correo electrónico previamente registrados. Solo podrán votar quienes figuren habilitados en el padrón oficial del certamen.</p>
+            <h3>4. Selecciona tu opción</h3>
+            <p>Marca la tarjeta de la opción que prefieras. Solo puedes elegir una opción por votación.</p>
           </div>
         </li>
         <li>
           <div class="vf-card">
             <h3>5. Revisa el resumen de tu selección</h3>
-            <p>Verifica que los datos de la categoría y la opción elegida coincidan con tu voluntad. En este paso aún puedes regresar y corregir tu selección.</p>
+            <p>Verifica la votación, la categoría y la opción elegida. En este paso aún puedes volver y cambiar tu selección.</p>
           </div>
         </li>
         <li>
           <div class="vf-card">
-            <h3>6. Confirma la emisión de tu voto</h3>
-            <p>Acepta la advertencia modal de voto definitivo. <strong>Una vez emitido, el voto no podrá ser modificado ni cancelado</strong>, garantizando el principio de un solo voto por persona.</p>
+            <h3>6. Confirma tu voto</h3>
+            <p>Pulsa <strong>Confirmar y registrar voto</strong>. <strong>Una vez registrado, el voto no se puede modificar ni cancelar</strong> y no podrás votar de nuevo en esa categoría.</p>
           </div>
         </li>
         <li>
           <div class="vf-card">
-            <h3>7. Descarga o imprime tu comprobante</h3>
-            <p>El sistema te presentará un comprobante digital con fecha, hora e identificador de trazabilidad para tu archivo personal.</p>
+            <h3>7. Guarda tu comprobante</h3>
+            <p>Verás un comprobante con la votación, la fecha, la hora y un número de comprobante. Puedes imprimirlo y consultar tus votos en <strong>Mi participación</strong>.</p>
           </div>
         </li>
       </ol>
@@ -93,7 +93,7 @@
             </h3>
             <div id="faqCollapse1" class="accordion-collapse collapse show" aria-labelledby="faqHeading1" data-bs-parent="#faqAccordion">
               <div class="accordion-body text-muted small">
-                El sistema todavía no recibe votos. Cuando se habilite la participación, se aplicarán las reglas oficiales del Festival.
+                No en la misma categoría. Puedes registrar un solo voto por categoría en cada edición, pero sí puedes votar en categorías diferentes. Si intentas votar de nuevo, el sistema rechaza el segundo voto.
               </div>
             </div>
           </div>
@@ -119,7 +119,7 @@
             </h3>
             <div id="faqCollapse3" class="accordion-collapse collapse" aria-labelledby="faqHeading3" data-bs-parent="#faqAccordion">
               <div class="accordion-body text-muted small">
-                Los resultados oficiales solo se divulgan una vez que el periodo de votación haya finalizado y los datos hayan sido auditados y validados por el comité organizador (RF-06). No se exhiben resultados parciales durante la votación.
+                Los resultados se publicarán en la sección <a href="{% url 'public:resultados' %}">Resultados</a> después del cierre de cada votación. Por ahora esa sección aún no muestra resultados, y mientras una votación está abierta el portal público no muestra resultados parciales.
               </div>
             </div>
           </div>
@@ -132,17 +132,19 @@
             </h3>
             <div id="faqCollapse4" class="accordion-collapse collapse" aria-labelledby="faqHeading4" data-bs-parent="#faqAccordion">
               <div class="accordion-body text-muted small">
-                La plataforma implementa disociación entre los datos de identificación del votante y el sentido del voto depositado en la urna virtual, cumpliendo a cabalidad con la Ley de Protección de Datos Personales (Habeas Data).
+                Tu cédula y tu correo se usan para verificar que estás en el padrón habilitado; en el panel administrativo se muestran enmascarados. Tu voto queda asociado a tu cuenta para impedir votos repetidos y mostrarte tu historial en Mi participación. Consulta la <a href="{% url 'public:privacidad' %}">política de tratamiento de datos</a>.
               </div>
             </div>
           </div>
         </div>
 
         <div class="vf-card vf-card--pad mt-4 bg-light border">
-          <h3 class="h6 text-dark mb-2"><i class="bi bi-shield-check text-success me-1"></i> Transparencia y Garantías</h3>
-          <p class="small text-muted mb-0">
-            Todas las reglas definitivas del proceso de votación son emanadas por la Fundación Festival de la Leyenda Vallenata. Este prototipo reproduce con exactitud las reglas de negocio técnicas concertadas.
-          </p>
+          <h3 class="h6 text-dark mb-2"><i class="bi bi-list-check text-success me-1"></i> Reglas que aplica el sistema</h3>
+          <ul class="small text-muted mb-0 ps-3">
+            <li>Un voto por persona en cada categoría y edición.</li>
+            <li>Solo se vota en procesos con estado Abierta y dentro de sus fechas.</li>
+            <li>Solo votan las personas habilitadas en el padrón de la edición.</li>
+          </ul>
         </div>
       </div>
     </div>

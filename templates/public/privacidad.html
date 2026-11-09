@@ -19,7 +19,7 @@
       <span class="vf-demo-tag"><i class="bi bi-shield-check"></i>Habeas Data</span>
     </div>
     <h1>Tratamiento de Datos Personales</h1>
-    <p>Lineamientos preliminares sobre privacidad, seguridad de la información y anonimización del voto en el marco del certamen.</p>
+    <p>Qué datos usa el sistema de votaciones, para qué los usa y quién puede consultarlos.</p>
   </div>
 </header>
 
@@ -32,16 +32,16 @@
           Los datos solicitados a los participantes (número de cédula y correo electrónico) se recaudan con el exclusivo propósito de verificar la habilitación en el padrón electoral oficial y prevenir el sufragio múltiple en concordancia con el requerimiento RF-03.
         </p>
 
-        <h2 class="h4 mb-3 mt-4">2. Principio de sufragio secreto</h2>
+        <h2 class="h4 mb-3 mt-4">2. Registro y confidencialidad del voto</h2>
         <p class="text-muted">
-          La arquitectura del sistema garantiza la estricta disociación entre los registros de autenticación del votante y el sentido del voto depositado. En ningún momento la organización o administradores podrán vincular la identidad de un ciudadano con la opción votada.
+          Cada voto se guarda en la base de datos asociado a la cuenta del votante, con la edición, la categoría, la votación, la opción elegida y la fecha. Esta asociación permite impedir votos repetidos en una misma categoría y mostrarte tu historial en Mi participación. La opción elegida no se muestra en el portal público ni en tu comprobante; solo el personal administrativo autorizado puede consultar los registros de votos.
         </p>
 
-        <h2 class="h4 mb-3 mt-4">3. Prototipo y datos de prueba</h2>
-        <div class="vf-alert vf-alert--demo mb-4">
+        <h2 class="h4 mb-3 mt-4">3. Almacenamiento de los datos</h2>
+        <div class="vf-alert vf-alert--info mb-4">
           <i class="bi bi-info-circle"></i>
           <div class="small">
-            En la presente fase de prototipado frontend, <strong>ningún dato ingresado en los formularios es remitido a servidores externos ni almacenado de forma persistente</strong>. Toda validación mostrada es de naturaleza demostrativa.
+            El número de cédula y el correo del padrón, la cuenta de votante y los votos registrados <strong>se almacenan en la base de datos del sistema</strong>. En el panel administrativo, la cédula y el correo se muestran enmascarados. El archivo CSV usado para cargar el padrón no se conserva después de procesarlo.
           </div>
         </div>
 

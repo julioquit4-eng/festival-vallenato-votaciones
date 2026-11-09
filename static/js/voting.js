@@ -37,28 +37,32 @@
     // Slider interactivo de Tradición (Inspirado en Referencias 1 y 3)
     var slides = [
       {
-        img: 'img/hero-acordeon.jpg',
+        img: 'img/acordeonero-festival-tarima.jpg',
+        alt: 'Acordeonero con sombrero vueltiao tocando en la tarima del Festival de la Leyenda Vallenata',
         badge: '<i class="bi bi-music-note-beamed"></i> Aire de Paseo · Rey Vallenato',
         badgeClass: 'vf-badge--yellow',
         title: 'La Majestad del Acordeón',
         desc: 'Los grandes juglares compiten por la corona suprema del Festival en la mítica plaza Alfonso López.'
       },
       {
-        img: 'img/danza-pilon.jpg',
+        img: 'img/desfile-piloneras.jpg',
+        alt: 'Piloneras con polleras amarillas y flores rojas desfilando sobre un jeep por las calles',
         badge: '<i class="bi bi-people-fill"></i> Tradición Popular · Desfile de Piloneras',
         badgeClass: 'vf-badge--royal',
         title: 'El Baile del Pilón Vallenato',
         desc: 'El desfile que abre el Festival: miles de danzantes llenan las calles de Valledupar con polleras y sombreros vueltiaos.'
       },
       {
-        img: 'img/sombrero-acordeon.jpg',
+        img: 'img/acordeonero-sombrero-vueltiao.jpg',
+        alt: 'Acordeonero mayor con sombrero vueltiao tocando en tarima frente al público',
         badge: '<i class="bi bi-chat-quote-fill"></i> Piqueria Mayor · Verso y Repentismo',
         badgeClass: 'vf-badge--orange',
         title: 'El Duelo de los Repentistas',
         desc: 'La agudeza mental campesina llevada a su máxima expresión en coplas improvisadas al ritmo de la caja y guacharaca.'
       },
       {
-        img: 'img/paisaje-cesar.jpg',
+        img: 'img/acordeonero-hohner-rojo.jpg',
+        alt: 'Joven acordeonero con sombrero vueltiao tocando un acordeón rojo',
         badge: '<i class="bi bi-tree-fill"></i> Canción Inédita · Tierra de Cantores',
         badgeClass: 'vf-badge--green',
         title: 'Poesía Hecha Canción',
@@ -66,97 +70,88 @@
       }
     ];
 
-    // --- MOVILIDAD E INTERACTIVIDAD DE .hero__visual ---
+    // --- CARRUSEL DE LA MITAD DERECHA: fundido suave, sin efectos al mover el cursor ---
     var heroVisual = document.querySelector('.hero__visual');
     var slideImg = document.getElementById('heroSlideImg');
+    var slideContent = document.querySelector('.hero-slider-card__content');
     var slideBadge = document.getElementById('heroSlideBadge');
     var slideTitle = document.getElementById('heroSlideTitle');
     var slideDesc = document.getElementById('heroSlideDesc');
     var slideCounter = document.getElementById('heroSliderCounter');
     var slideDots = document.querySelectorAll('.hero-slider-dot');
-    var slideCard = document.getElementById('heroSlideCard');
-    var stickers = document.querySelectorAll('.folklore-sticker');
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var FADE_MS = reduceMotion ? 0 : 300;
+    var AUTO_MS = 8000;
 
     var curSlide = 0;
+
+    // Precarga solo la foto siguiente (no las cuatro a la vez) para no gastar datos en el celular
+    function precargar(idx) {
+      var s = slides[(idx + slides.length) % slides.length];
+      var im = new Image();
+      im.src = VF.static ? VF.static(s.img) : '../static/' + s.img;
+    }
+    window.addEventListener('load', function () { precargar(1); });
 
     function updateSlide(idx) {
       curSlide = (idx + slides.length) % slides.length;
       var s = slides[curSlide];
-      if (slideCard) {
-        slideCard.style.opacity = '0.35';
-        slideCard.style.transform = 'scale(0.98)';
-        setTimeout(function() {
-          if (slideImg) slideImg.src = VF.static ? VF.static(s.img) : '../static/' + s.img;
-          if (slideBadge) {
-            slideBadge.className = 'vf-badge ' + s.badgeClass + ' mb-1';
-            slideBadge.innerHTML = s.badge;
-          }
-          if (slideTitle) slideTitle.textContent = s.title;
-          if (slideDesc) slideDesc.textContent = s.desc;
-          if (slideCounter) slideCounter.textContent = '0' + (curSlide + 1) + ' / 0' + slides.length;
-          slideDots.forEach(function(dot, dIdx) {
-            dot.classList.toggle('is-active', dIdx === curSlide);
-          });
-          slideCard.style.opacity = '1';
-          slideCard.style.transform = '';
-        }, 160);
-      }
+      if (slideImg) slideImg.classList.add('is-fading');
+      if (slideContent) slideContent.classList.add('is-fading');
+      setTimeout(function () {
+        if (slideImg) {
+          slideImg.src = VF.static ? VF.static(s.img) : '../static/' + s.img;
+          slideImg.alt = s.alt || s.title;
+        }
+        if (slideBadge) {
+          slideBadge.className = 'vf-badge ' + s.badgeClass + ' mb-1';
+          slideBadge.innerHTML = s.badge;
+        }
+        if (slideTitle) slideTitle.textContent = s.title;
+        if (slideDesc) slideDesc.textContent = s.desc;
+        if (slideCounter) slideCounter.textContent = '0' + (curSlide + 1) + ' / 0' + slides.length;
+        slideDots.forEach(function (dot, dIdx) {
+          dot.classList.toggle('is-active', dIdx === curSlide);
+          if (dIdx === curSlide) dot.setAttribute('aria-current', 'true');
+          else dot.removeAttribute('aria-current');
+        });
+        if (slideImg) slideImg.classList.remove('is-fading');
+        if (slideContent) slideContent.classList.remove('is-fading');
+        precargar(curSlide + 1);
+      }, FADE_MS);
     }
 
     var btnPrev = document.getElementById('heroSliderPrev');
     var btnNext = document.getElementById('heroSliderNext');
-    if (btnPrev) btnPrev.addEventListener('click', function() { updateSlide(curSlide - 1); });
-    if (btnNext) btnNext.addEventListener('click', function() { updateSlide(curSlide + 1); });
+    if (btnPrev) btnPrev.addEventListener('click', function () { updateSlide(curSlide - 1); });
+    if (btnNext) btnNext.addEventListener('click', function () { updateSlide(curSlide + 1); });
 
-    slideDots.forEach(function(dot) {
-      dot.addEventListener('click', function() {
+    slideDots.forEach(function (dot) {
+      dot.addEventListener('click', function () {
         var idx = parseInt(this.dataset.slide, 10);
         if (!isNaN(idx)) updateSlide(idx);
       });
     });
 
-    // Auto-avance suave cada 6s
-    var sliderTimer = setInterval(function() {
-      updateSlide(curSlide + 1);
-    }, 6000);
+    // Avance automático cada 8 s. Se pausa con el cursor encima o con el foco
+    // del teclado dentro, y no se activa si la persona pidió reducir movimiento.
+    var sliderTimer = null;
+    function startAuto() {
+      if (reduceMotion || sliderTimer) return;
+      sliderTimer = setInterval(function () { updateSlide(curSlide + 1); }, AUTO_MS);
+    }
+    function stopAuto() {
+      clearInterval(sliderTimer);
+      sliderTimer = null;
+    }
+    startAuto();
 
     if (heroVisual) {
-      heroVisual.addEventListener('mouseenter', function() { clearInterval(sliderTimer); });
-      heroVisual.addEventListener('mouseleave', function() {
-        clearInterval(sliderTimer);
-        sliderTimer = setInterval(function() { updateSlide(curSlide + 1); }, 6000);
-        // Reset transform al salir el cursor
-        if (slideCard) {
-          slideCard.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
-        }
-        stickers.forEach(function(st) {
-          st.style.transform = '';
-        });
-      });
-
-      // Efecto interactivo de perspectiva y movilidad al mover el ratón (Tilt & Parallax)
-      heroVisual.addEventListener('mousemove', function(e) {
-        var rect = heroVisual.getBoundingClientRect();
-        var x = e.clientX - rect.left;
-        var y = e.clientY - rect.top;
-        var centerX = rect.width / 2;
-        var centerY = rect.height / 2;
-        
-        var deltaX = (x - centerX) / centerX; // -1 a 1
-        var deltaY = (y - centerY) / centerY; // -1 a 1
-
-        // Inclinación 3D para la tarjeta
-        if (slideCard) {
-          var tiltX = (deltaY * -7).toFixed(2);
-          var tiltY = (deltaX * 7).toFixed(2);
-          slideCard.style.transform = 'perspective(1000px) rotateX(' + tiltX + 'deg) rotateY(' + tiltY + 'deg) translateZ(6px)';
-        }
-
-        // Movilidad reactiva en stickers flotantes
-        stickers.forEach(function(st, idx) {
-          var factor = (idx + 1) * 12;
-          st.style.transform = 'translate(' + (-deltaX * factor) + 'px, ' + (-deltaY * factor) + 'px)';
-        });
+      heroVisual.addEventListener('mouseenter', stopAuto);
+      heroVisual.addEventListener('mouseleave', startAuto);
+      heroVisual.addEventListener('focusin', stopAuto);
+      heroVisual.addEventListener('focusout', function (e) {
+        if (!heroVisual.contains(e.relatedTarget)) startAuto();
       });
     }
 

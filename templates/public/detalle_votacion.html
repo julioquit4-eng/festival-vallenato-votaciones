@@ -37,6 +37,8 @@
   </header>
 
   <div class="container my-5">
+    {# Si la persona puede votar, las opciones se muestran una sola vez dentro del formulario. #}
+    {% if not votacion_habilitada or ya_voto or not puede_votar %}
     <section aria-labelledby="optionsHeading">
       <h2 class="h3 mb-4" id="optionsHeading">Opciones participantes</h2>
       <div class="row g-4">
@@ -62,12 +64,13 @@
         {% endfor %}
       </div>
     </section>
+    {% endif %}
 
     {% if votacion_habilitada %}
       {% if ya_voto %}
         <div class="vf-alert vf-alert--info mt-4" role="status">
           <i class="bi bi-check-circle"></i>
-          <div>Ya registraste tu voto en esta categoría.</div>
+          <div>Ya registraste tu voto en esta categoría. Puedes consultarlo en <a href="{% url 'public:categorias_votadas' %}">Mi participación</a>.</div>
         </div>
       {% elif puede_votar %}
         <form method="post" action="{{ voto_url }}" class="mt-4">
@@ -95,6 +98,11 @@
             <button type="submit" class="btn btn-vf btn-lg mt-4">
               Continuar para confirmar <i class="bi bi-arrow-right"></i>
             </button>
+          {% else %}
+            <div class="vf-empty">
+              <i class="bi bi-music-note-list" aria-hidden="true"></i>
+              <p>No hay opciones activas registradas para esta votación.</p>
+            </div>
           {% endif %}
         </form>
       {% elif request.user.is_authenticated %}

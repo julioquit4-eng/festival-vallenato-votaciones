@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Panel de Control{% endblock %} · Festival Vallenato 2027</title>
   <meta name="theme-color" content="#10243A">
-  <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+  <link rel="icon" href="{% static 'img/favicon-32.png' %}" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,7 +31,7 @@
       </div>
       
       <a href="{% url 'panel:dashboard' %}" class="panel-brand">
-        <span class="vf-brand__mark"><i class="bi bi-shield-shaded"></i></span>
+        <img class="vf-brand__logo" src="{% static 'img/logo-festival.png' %}" alt="" width="180" height="192">
         <div>
           <strong>Panel Electoral</strong>
           <small>Festival Vallenato 2027</small>

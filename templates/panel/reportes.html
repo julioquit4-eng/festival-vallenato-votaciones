@@ -76,11 +76,13 @@
           <tr>
             <td class="text-center fw-bold">{{ forloop.counter }}°</td>
             <td><strong>{{ opcion.nombre }}</strong></td>
-            <td>{{ opcion.total_votos }} votos</td>
+            <td>{{ opcion.total_votos }} voto{{ opcion.total_votos|pluralize }}</td>
             <td>{{ opcion.porcentaje|floatformat:1 }} %</td>
             <td style="min-width: 140px;">
-              <div class="progress" style="height: 10px;">
-                <div class="progress-bar bg-primary" style="width: {{ opcion.porcentaje|floatformat:1 }}%"></div>
+              {# El porcentaje ya se lee en la columna anterior; la barra es solo visual. #}
+              <div class="progress" style="height: 10px;" aria-hidden="true">
+                {# "1u" = sin formato regional: CSS necesita punto decimal (100.0), no coma. #}
+                <div class="progress-bar bg-primary" style="width: {{ opcion.porcentaje|floatformat:'1u' }}%"></div>
               </div>
             </td>
           </tr>

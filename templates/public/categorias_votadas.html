@@ -2,13 +2,13 @@
 
 {% block title %}Mi participación{% endblock %}
 {% block page_id %}categorias_votadas{% endblock %}
-{% block nav_section %}votaciones{% endblock %}
+{% block nav_section %}participacion{% endblock %}
 
 {% block content %}
 <header class="page-hero">
   <div class="container">
     <h1>Mi participación</h1>
-    <p>Consulta las categorías en las que has registrado tu voto.</p>
+    <p>Consulta las categorías en las que has registrado tu voto. Por confidencialidad, aquí no se muestra la opción elegida.</p>
   </div>
 </header>
 
@@ -16,17 +16,25 @@
   <div class="row g-4">
     {% for voto in votos %}
       <div class="col-md-6 col-lg-4">
-        <article class="vf-card vote-card">
+        <article class="vf-card vote-card h-100">
           <div class="vote-card__body">
+            <span class="vf-status vf-status--abierta mb-2"><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Voto registrado</span>
             <h2 class="vote-card__title h4">{{ voto.categoria.nombre }}</h2>
-            <p class="vote-card__desc">{{ voto.categoria.edicion.nombre }} · {{ voto.categoria.edicion.anio }}</p>
-            <p class="small text-muted mb-0">Registrado el {{ voto.fecha_hora|date:"d/m/Y H:i" }}</p>
+            <p class="vote-card__desc mb-1">{{ voto.votacion.titulo }}</p>
+            <p class="small text-muted">{{ voto.categoria.edicion.nombre }} · {{ voto.categoria.edicion.anio }}<br>Registrado el {{ voto.fecha_hora|date:"d/m/Y H:i" }}</p>
+            <a class="btn btn-vf-outline btn-sm" href="{% url 'public:comprobante_voto' voto.pk %}">
+              <i class="bi bi-receipt" aria-hidden="true"></i> Ver comprobante<span class="visually-hidden"> de {{ voto.categoria.nombre }}</span>
+            </a>
           </div>
         </article>
       </div>
     {% empty %}
       <div class="col-12">
-        <p class="text-center text-muted py-5">Aún no has votado en ninguna categoría.</p>
+        <div class="vf-empty text-center py-5">
+          <i class="bi bi-inbox" aria-hidden="true"></i>
+          <p class="text-muted">Aún no has votado en ninguna categoría.</p>
+          <a class="btn btn-vf" href="{% url 'public:votaciones' %}">Ver votaciones abiertas <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+        </div>
       </div>
     {% endfor %}
   </div>

@@ -41,36 +41,17 @@
       </div>
 
       <div class="hero__meta vf-reveal vf-reveal-4 mt-4">
-        <span><i class="bi bi-shield-check text-success"></i>Voto único y secreto</span>
+        <span><i class="bi bi-shield-check text-success"></i>Un voto por categoría</span>
         <span><i class="bi bi-phone text-primary"></i>Optimizado para móviles</span>
-        <span><i class="bi bi-award text-warning"></i>Resultados auditados</span>
+        <span><i class="bi bi-award text-warning"></i>Resultados tras el cierre</span>
       </div>
     </div>
 
-    <!-- Columna Visual: Slider Interactivo de Tradición (Inspirado en Referencias 1 y 3) -->
-    <div class="hero__visual position-relative">
-      <!-- Sticker Flotante 1: Sombrero Vueltiao (Referencia 2 y 4) -->
-      <div class="folklore-sticker folklore-sticker--sombrero d-none d-sm-flex" title="¡Símbolo de la colombianidad!">
-        <span style="font-size: 1.4rem;">👒</span>
-        <div class="lh-1 text-start">
-          <strong class="d-block text-dark" style="font-size: 0.8rem;">¡Ay, hombe!</strong>
-          <small class="text-muted" style="font-size: 0.68rem;">Sombrero Vueltiao</small>
-        </div>
-      </div>
-
-      <!-- Sticker Flotante 2: Parranda y Danza (Referencia 1 y 2) -->
-      <div class="folklore-sticker folklore-sticker--pilon d-none d-sm-flex" title="Danza tradicional del Pilón">
-        <span style="font-size: 1.4rem;">💃</span>
-        <div class="lh-1 text-start">
-          <strong class="d-block text-dark" style="font-size: 0.8rem;">El Pilón Vallenato</strong>
-          <small class="text-muted" style="font-size: 0.68rem;">Alegría y Polleras</small>
-        </div>
-      </div>
-
-      <!-- Tarjeta Principal del Slider de Experiencias -->
+    <!-- Columna visual: la foto ocupa toda la mitad derecha, sin efectos al pasar el cursor -->
+    <div class="hero__visual position-relative" aria-roledescription="carrusel" aria-label="Momentos del Festival">
       <div class="hero-slider-wrap">
         <div class="hero-slider-card" id="heroSlideCard">
-          <img src="{% static 'img/hero-acordeon.jpg' %}" id="heroSlideImg" alt="Acordeón vallenato en balcón colonial" width="900" height="600">
+          <img src="{% static 'img/acordeonero-festival-tarima.jpg' %}" id="heroSlideImg" alt="Acordeonero con sombrero vueltiao tocando en la tarima del Festival de la Leyenda Vallenata" width="1139" height="760" fetchpriority="high">
           <div class="hero-slider-card__content">
             <span class="vf-badge vf-badge--yellow mb-1" id="heroSlideBadge">
               <i class="bi bi-music-note-beamed"></i> Aire de Paseo
@@ -229,8 +210,8 @@
             <article class="step-card">
               <span class="step-card__num" aria-hidden="true">03</span>
               <span class="vf-icon-circle"><i class="bi bi-patch-check" aria-hidden="true"></i></span>
-              <h3>Participación pendiente</h3>
-              <p>Confirma tu elección para registrar un voto único en la categoría.</p>
+              <h3>Inicia sesión y vota</h3>
+              <p>Ingresa con tus datos del padrón y confirma tu elección para registrar un voto en la categoría.</p>
             </article>
           </div>
         </div>
@@ -245,14 +226,14 @@
     <div class="row g-5 align-items-center">
       <div class="col-lg-6 order-lg-2">
         <figure class="vf-photo mb-0" style="aspect-ratio: 16/11;">
-          <img src="{% static 'img/paisaje-cesar.jpg' %}" alt="Valle verde atravesado por un río, con montañas nevadas al fondo al amanecer" loading="lazy" width="1376" height="768">
-          <figcaption>Paisaje ilustrativo del Cesar</figcaption>
+          <img src="{% static 'img/votar-desde-el-celular.jpg' %}" alt="Collage: acordeonero en tarima, mujer sonriendo mientras usa su celular y palenquera con frutas en la cabeza" loading="lazy" width="738" height="414">
+          <figcaption>La tradición vallenata, ahora también desde el celular</figcaption>
         </figure>
       </div>
       <div class="col-lg-6">
         <span class="vf-eyebrow">Propósito de la plataforma</span>
         <h2 class="section__title" id="propositoTitle">Una tradición que se escucha, ahora también se vota</h2>
-        <p class="section__lead">Esta plataforma busca acercar al público al Festival permitiendo participar en votaciones habilitadas por la organización, con reglas visibles y resultados publicados solo cuando han sido validados.</p>
+        <p class="section__lead">Esta plataforma busca acercar al público al Festival permitiendo participar en votaciones habilitadas por la organización, con reglas visibles y resultados que se publicarán después del cierre de cada votación.</p>
         <ul class="list-unstyled mt-4 d-grid gap-3">
           <li class="d-flex gap-3"><span class="vf-icon-circle"><i class="bi bi-people" aria-hidden="true"></i></span><div><strong>Participación ciudadana</strong><br><span class="text-muted">Votaciones del público por categoría.</span></div></li>
           <li class="d-flex gap-3"><span class="vf-icon-circle"><i class="bi bi-shield-check" aria-hidden="true"></i></span><div><strong>Protección de datos</strong><br><span class="text-muted">Solo se solicitan los datos necesarios para validar el acceso.</span></div></li>
@@ -269,8 +250,8 @@
     <div class="row g-5 align-items-center">
       <div class="col-lg-6">
         <span class="vf-eyebrow">Transparencia</span>
-        <h2 class="section__title" id="resultadosTitle">Resultados confiables, cultura que nos une</h2>
-        <p class="section__lead">Los resultados oficiales se publican después del cierre y la validación de cada votación por parte de la organización.</p>
+        <h2 class="section__title" id="resultadosTitle">Resultados claros, cultura que nos une</h2>
+        <p class="section__lead">Los resultados se publicarán después del cierre de cada votación. Mientras una votación está abierta no se muestran resultados parciales.</p>
         <p class="d-flex align-items-center gap-2 mt-4 mb-0 small fw-semibold text-muted"><i class="bi bi-calendar-event text-gold fs-5" aria-hidden="true"></i>Las fechas de publicación dependen del calendario aprobado.</p>
       </div>
       <div class="col-lg-5 offset-lg-1">

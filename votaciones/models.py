@@ -11,17 +11,17 @@ class Edicion(models.Model):
     )
     anio = models.PositiveIntegerField(
         unique=True,
-        verbose_name="A├▒o"
+        verbose_name="Año"
     )
     descripcion = models.TextField(
         blank=True,
-        verbose_name="Descripci├│n"
+        verbose_name="Descripción"
     )
     fecha_inicio = models.DateField(
         verbose_name="Fecha de inicio"
     )
     fecha_fin = models.DateField(
-        verbose_name="Fecha de finalizaci├│n"
+        verbose_name="Fecha de finalización"
     )
     activa = models.BooleanField(
         default=False,
@@ -29,14 +29,14 @@ class Edicion(models.Model):
     )
 
     class Meta:
-        verbose_name = "Edici├│n"
+        verbose_name = "Edición"
         verbose_name_plural = "Ediciones"
         ordering = ["-anio"]
 
     def clean(self):
         if self.fecha_fin < self.fecha_inicio:
             raise ValidationError(
-                "La fecha de finalizaci├│n no puede ser anterior "
+                "La fecha de finalización no puede ser anterior "
                 "a la fecha de inicio."
             )
 
@@ -49,7 +49,7 @@ class Categoria(models.Model):
         Edicion,
         on_delete=models.CASCADE,
         related_name="categorias",
-        verbose_name="Edici├│n"
+        verbose_name="Edición"
     )
     nombre = models.CharField(
         max_length=150,
@@ -57,7 +57,7 @@ class Categoria(models.Model):
     )
     descripcion = models.TextField(
         blank=True,
-        verbose_name="Descripci├│n"
+        verbose_name="Descripción"
     )
     activa = models.BooleanField(
         default=True,
@@ -65,8 +65,8 @@ class Categoria(models.Model):
     )
 
     class Meta:
-        verbose_name = "Categor├¡a"
-        verbose_name_plural = "Categor├¡as"
+        verbose_name = "Categoría"
+        verbose_name_plural = "Categorías"
         ordering = ["nombre"]
         constraints = [
             models.UniqueConstraint(
@@ -91,15 +91,15 @@ class Votacion(models.Model):
         Categoria,
         on_delete=models.CASCADE,
         related_name="votaciones",
-        verbose_name="Categor├¡a"
+        verbose_name="Categoría"
     )
     titulo = models.CharField(
         max_length=200,
-        verbose_name="T├¡tulo"
+        verbose_name="Título"
     )
     descripcion = models.TextField(
         blank=True,
-        verbose_name="Descripci├│n"
+        verbose_name="Descripción"
     )
     fecha_apertura = models.DateTimeField(
         verbose_name="Fecha y hora de apertura"
@@ -115,7 +115,7 @@ class Votacion(models.Model):
     )
 
     class Meta:
-        verbose_name = "Votaci├│n"
+        verbose_name = "Votación"
         verbose_name_plural = "Votaciones"
         ordering = ["-fecha_apertura"]
         constraints = [
@@ -150,7 +150,7 @@ class Opcion(models.Model):
         Votacion,
         on_delete=models.CASCADE,
         related_name="opciones",
-        verbose_name="Votaci├│n"
+        verbose_name="Votación"
     )
     nombre = models.CharField(
         max_length=200,
@@ -158,7 +158,7 @@ class Opcion(models.Model):
     )
     descripcion = models.TextField(
         blank=True,
-        verbose_name="Descripci├│n"
+        verbose_name="Descripción"
     )
     imagen_url = models.URLField(
         blank=True,
@@ -170,11 +170,11 @@ class Opcion(models.Model):
     )
     orden = models.PositiveIntegerField(
         default=0,
-        verbose_name="Orden de visualizaci├│n"
+        verbose_name="Orden de visualización"
     )
 
     class Meta:
-        verbose_name = "Opci├│n"
+        verbose_name = "Opción"
         verbose_name_plural = "Opciones"
         ordering = ["orden", "nombre"]
         constraints = [
@@ -196,25 +196,25 @@ class Voto(models.Model):
         Edicion,
         on_delete=models.PROTECT,
         related_name="votos",
-        verbose_name="Edici├│n",
+        verbose_name="Edición",
     )
     categoria = models.ForeignKey(
         Categoria,
         on_delete=models.PROTECT,
         related_name="votos",
-        verbose_name="Categor├¡a",
+        verbose_name="Categoría",
     )
     votacion = models.ForeignKey(
         Votacion,
         on_delete=models.PROTECT,
         related_name="votos",
-        verbose_name="Votaci├│n",
+        verbose_name="Votación",
     )
     opcion = models.ForeignKey(
         Opcion,
         on_delete=models.PROTECT,
         related_name="votos",
-        verbose_name="Opci├│n",
+        verbose_name="Opción",
     )
     fecha_hora = models.DateTimeField(
         auto_now_add=True,
@@ -238,19 +238,19 @@ class Voto(models.Model):
         if self.categoria_id and self.edicion_id:
             if self.categoria.edicion_id != self.edicion_id:
                 errores["categoria"] = (
-                    "La categor├¡a no pertenece a la edici├│n seleccionada."
+                    "La categoría no pertenece a la edición seleccionada."
                 )
 
         if self.votacion_id and self.categoria_id:
             if self.votacion.categoria_id != self.categoria_id:
                 errores["votacion"] = (
-                    "La votaci├│n no pertenece a la categor├¡a seleccionada."
+                    "La votación no pertenece a la categoría seleccionada."
                 )
 
         if self.opcion_id and self.votacion_id:
             if self.opcion.votacion_id != self.votacion_id:
                 errores["opcion"] = (
-                    "La opci├│n no pertenece a la votaci├│n seleccionada."
+                    "La opción no pertenece a la votación seleccionada."
                 )
 
         if errores:
@@ -285,7 +285,7 @@ class Votante(models.Model):
         Edicion,
         on_delete=models.CASCADE,
         related_name="votantes",
-        verbose_name="Edici├│n",
+        verbose_name="Edición",
     )
     documento = models.CharField(max_length=32, verbose_name="Documento")
     correo = models.EmailField(max_length=254, verbose_name="Correo")
